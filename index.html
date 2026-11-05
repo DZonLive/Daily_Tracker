@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Productivity Starter</title>
+<meta name="description" content="Time journal: track study, work, workouts and rest, plan tasks and keep a streak.">
+<meta name="theme-color" content="#f3f4f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12141a" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Productivity">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="titlerow"><h1>Productivity Starter</h1><span class="beta" id="verBadge">Beta</span></div>
+      <div class="sub" data-t="sub"></div>
+    </div>
+    <div class="hdr-r">
+      <div class="daynav">
+        <button class="iconbtn" id="prev" data-ta="prevDay">‹</button>
+        <div class="d" id="dayLabel">—</div>
+        <button class="iconbtn" id="next" data-ta="nextDay">›</button>
+        <button class="chipbtn" id="today" data-t="today"></button>
+      </div>
+      <button class="installbtn" id="installBtn" hidden data-t="install"></button>
+      <button class="acctbtn" id="acctBtn" type="button">…</button>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en" id="lang-en">EN</button>
+        <button type="button" data-lang="ru" id="lang-ru">RU</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="topgrid">
+    <section class="panel" data-ta="calendar">
+      <div class="calhead">
+        <button class="iconbtn" id="mPrev" data-ta="prevMonth">‹</button>
+        <div class="m" id="mLabel">—</div>
+        <button class="iconbtn" id="mNext" data-ta="nextMonth">›</button>
+      </div>
+      <div class="calgrid" id="cal"></div>
+      <div class="legend" id="legend"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="sumH">
+      <div class="panel-head"><h2 id="sumH" data-t="daySummary"></h2><span class="status" id="status"></span></div>
+      <div class="streak" id="streak"></div>
+      <div class="total">
+        <div>
+          <div class="label" data-t="totalLogged"></div>
+          <div class="big" id="totalBig">0</div>
+        </div>
+        <div class="ratio" id="ratio"></div>
+      </div>
+      <div class="strip" id="strip"></div>
+      <div class="cats" id="cats"></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="planH">
+    <div class="panel-head"><h2 id="planH" data-t="plan"></h2><span class="hint" data-t="planHint"></span></div>
+    <div class="plan">
+      <div>
+        <h3><span data-t="tasks"></span><span class="prog" id="taskProg"></span></h3>
+        <ul class="tasks" id="tasks"></ul>
+        <div class="row">
+          <input type="text" id="taskIn" class="grow" data-tp="taskPh">
+          <button class="primary" id="taskAdd" data-t="add"></button>
+        </div>
+      </div>
+      <div>
+        <h3><span data-t="notes"></span><span class="prog" id="noteSaved"></span></h3>
+        <textarea id="noteArea" data-tp="notesPh"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="tlH">
+    <div class="panel-head"><h2 id="tlH" data-t="timeline"></h2><span class="hint" data-t="scale"></span></div>
+    <div class="tl" id="tl"></div>
+    <div class="tlaxis" id="tlaxis"></div>
+    <div class="tlnote" id="tlnote"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="addH">
+    <div class="panel-head"><h2 id="addH" data-t="logTime"></h2><span class="hint" id="addFor"></span></div>
+    <div class="logger">
+      <div>
+        <div class="seg" id="seg" role="group"></div>
+        <div class="field">
+          <span class="label" data-t="howLong"></span>
+          <div class="durs" id="durs"></div>
+          <div class="row">
+            <label class="inp w-dur"><span data-t="custom"></span><input type="text" id="durIn" class="mono" placeholder="1:20" inputmode="decimal"></label>
+            <label class="inp w-time"><span data-t="start"></span><input type="time" id="startIn" class="mono"></label>
+            <label class="inp grow"><span data-t="note"></span><input type="text" id="noteIn" data-tp="notePh"></label>
+            <button class="primary" id="addBtn" data-t="add"></button>
+          </div>
+          <div class="hint" data-t="startHint"></div>
+          <div class="msg" id="msg"></div>
+        </div>
+      </div>
+      <div class="timer" id="timer"></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="logH">
+    <div class="panel-head"><h2 id="logH" data-t="journal"></h2><span class="hint" id="logCount"></span></div>
+    <ul class="log" id="log"></ul>
+  </section>
+
+  <section class="panel" aria-labelledby="wkH">
+    <div class="panel-head"><h2 id="wkH" data-t="week"></h2><span class="hint" id="wkRange"></span></div>
+    <div class="week">
+      <div class="chart" id="chart"></div>
+      <div class="wk-tot" id="wkTot"></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="wdH">
+    <div class="panel-head"><h2 id="wdH" data-t="weekDetail"></h2>
+      <div class="wdtools">
+        <button class="iconbtn" id="wPrev" data-ta="prevWeek">‹</button>
+        <span class="hint mono" id="wdRange" style="min-width:150px;text-align:center"></span>
+        <button class="iconbtn" id="wNext" data-ta="nextWeek">›</button>
+        <div class="mode" role="group">
+          <button type="button" data-wdr="auto" id="wdr-auto" data-t="rangeAuto"></button>
+          <button type="button" data-wdr="full" id="wdr-full">0–24</button>
+        </div>
+      </div>
+    </div>
+    <div class="wdscroll"><div class="wd" id="wd"></div></div>
+    <div class="wdnote" id="wdnote"></div>
+    <details class="wtable" id="wtable">
+      <summary data-t="showTable"></summary>
+      <div class="tblwrap"><table class="wt" id="wt"></table></div>
+    </details>
+  </section>
+
+  <section class="panel" aria-labelledby="dataH">
+    <div class="panel-head"><h2 id="dataH" data-t="dataTitle"></h2><span class="hint" id="syncNote"></span></div>
+    <div class="datarow">
+      <button class="chipbtn" id="exportBtn" data-t="exportBtn"></button>
+      <label class="chipbtn filebtn"><span data-t="importBtn"></span><input type="file" id="importIn" accept="application/json,.json"></label>
+    </div>
+    <div class="migrate" id="migrateBox" hidden>
+      <p id="migrateText"></p>
+      <button class="primary" id="migrateBtn" data-t="migrateBtn"></button>
+    </div>
+    <div class="datamsg" id="dataMsg"></div>
+    <p class="hint" data-t="dataHint" style="margin:6px 0 0"></p>
+    <p class="hint ios" id="iosHint" hidden data-t="iosHint"></p>
+  </section>
+
+  <section class="panel" id="catsPanel" aria-labelledby="cgH">
+    <div class="panel-head"><h2 id="cgH" data-t="catsGoals"></h2>
+      <div class="mode" role="group">
+        <button type="button" data-mode="week" id="mode-week" data-t="perWeek"></button>
+        <button type="button" data-mode="day" id="mode-day" data-t="perDay"></button>
+      </div>
+    </div>
+    <p class="hint" id="goalHint" style="margin:0"></p>
+    <div class="catlist" id="catlist"></div>
+    <div class="streakset">
+      <label for="streakMin" data-t="streakRule"></label>
+      <input type="number" id="streakMin" min="1" step="15" class="mono">
+      <span class="hint" data-t="streakRule2"></span>
+    </div>
+    <div class="newcat">
+      <span class="label" data-t="newCat"></span>
+      <div class="row">
+        <input type="text" id="ncName" class="grow" data-tp="namePh" maxlength="24">
+        <label class="chk"><input type="checkbox" id="ncProd" checked><span data-t="prodLabel"></span></label>
+        <button class="primary" id="ncAdd" data-t="add"></button>
+      </div>
+      <div class="swatches" id="ncSw"></div>
+    </div>
+  </section>
+</div>
+
+<footer class="foot"><span id="footVer"></span> · <a href="https://github.com/DZonLive/Daily_Tracker" target="_blank" rel="noopener">GitHub</a></footer>
+
+<div class="updatebar" id="updateBar" hidden role="status">
+  <span data-t="updateText"></span>
+  <button class="primary" id="updateBtn" data-t="updateBtn"></button>
+</div>
+
+<dialog id="acct" aria-labelledby="acctTitle">
+  <div class="dlg">
+    <div class="dlg-head"><h2 id="acctTitle" data-t="account"></h2><button class="del" id="acctClose" data-ta="close">×</button></div>
+    <div id="acctOut">
+      <p class="lead" data-t="signInLead"></p>
+      <div id="acctUnavailable" hidden class="datamsg err" data-t="acctUnavailable"></div>
+      <div id="acctForm" class="acctform">
+        <button class="google" id="gBtn" type="button"><svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span data-t="google"></span></button>
+        <div class="or"><span data-t="orEmail"></span></div>
+        <label class="inp"><span data-t="email"></span><input type="email" id="acctEmail" autocomplete="email" inputmode="email"></label>
+        <label class="inp"><span data-t="password"></span><input type="password" id="acctPass" autocomplete="current-password" minlength="6"></label>
+        <div class="row">
+          <button class="primary" id="emailIn" data-t="signInBtn"></button>
+          <button class="ghost" id="emailUp" data-t="signUpBtn"></button>
+        </div>
+        <button class="linkbtn" id="resetBtn" data-t="forgot"></button>
+      </div>
+    </div>
+    <div id="acctIn" hidden>
+      <p class="lead"><span data-t="signedInAs"></span> <b id="acctWho"></b></p>
+      <p class="hint" data-t="syncOn"></p>
+      <button class="ghost" id="signOutBtn" data-t="signOut"></button>
+    </div>
+    <div class="datamsg" id="acctMsg"></div>
+  </div>
+</dialog>
+
+<script src="app.js"></script>
+
+</body>
+</html>
