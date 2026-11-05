@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.9.0";
+const APP_VERSION="0.9.1";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -648,7 +648,7 @@ document.addEventListener("click",async ev=>{
     case "emailIn":doAuth("in");break;
     case "emailUp":doAuth("up");break;
     case "resetBtn":doAuth("reset");break;
-    case "signOutBtn":flushNote();if(cloud)cloud.signOut().then(()=>$("acct").close());break;
+    case "signOutBtn":flushNote();if(cloud){$("signOutBtn").disabled=true;cloud.signOut().finally(()=>location.reload())}break;
     case "migrateBtn":migrateLocal();break;
     case "installBtn":if(deferredInstall){deferredInstall.prompt();deferredInstall.userChoice.finally(()=>{deferredInstall=null;$("installBtn").hidden=true})}break;
     case "addBtn":{

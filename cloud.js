@@ -14,6 +14,7 @@ import {
 import {
   initializeFirestore, persistentLocalCache, persistentMultipleTabManager, memoryLocalCache,
   collection, doc, onSnapshot, setDoc, deleteDoc, writeBatch, getDocs, serverTimestamp,
+  terminate, clearIndexedDbPersistence,
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
 // These keys are public by design: Firebase protects data with security rules, not with this config.
@@ -53,7 +54,12 @@ export function signInGoogle() {
 export const signInEmail = (email, pass) => signInWithEmailAndPassword(auth, email, pass);
 export const signUpEmail = (email, pass) => createUserWithEmailAndPassword(auth, email, pass);
 export const resetPassword = (email) => sendPasswordResetEmail(auth, email);
-export const signOut = () => fbSignOut(auth);
+// Sign out and wipe the offline copy of the data from this browser,
+// so the next person using this device can't see it. The page reloads afterwards.
+export async function signOut() {
+  await fbSignOut(auth);
+  try { await terminate(db); await clearIndexedDbPersistence(db); } catch (e) { console.warn("Couldn't clear offline cache:", e); }
+}
 
 // ---------- live data ----------
 // onDays(daysMap, meta)        meta = { fromCache, pending }

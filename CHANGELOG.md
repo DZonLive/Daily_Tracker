@@ -3,6 +3,9 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.9.1 (beta) — 2026-11-05
+- Security: signing out now also deletes the offline copy of your data from this browser
+
 ## 0.9.0 (beta) — 2026-11-05
 First public beta.
 
