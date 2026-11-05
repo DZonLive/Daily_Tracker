@@ -28,6 +28,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+// getAuth keeps the sign-in in IndexedDB on this device ("local" persistence), so you stay signed in
+// after closing the app, restarting the phone or installing an update. Only "Sign out" removes it.
 const auth = getAuth(app);
 
 // Offline cache in IndexedDB, shared between open tabs. Falls back to memory if the browser refuses.

@@ -2,19 +2,21 @@
 //
 // How updates work:
 //  1. Change the app files and bump VERSION below (same number as APP_VERSION in app.js).
-//  2. Browsers notice the new sw.js, install it in the background and keep it "waiting".
-//  3. The app shows a "New version available — Update" bar; tapping it activates the new version and reloads.
+//  2. Browsers notice the new sw.js and activate it right away (skipWaiting), so a normal reload
+//     always shows the new version.
+//  3. If the app was already open when the update arrived, it shows "New version available — Update";
+//     tapping it reloads the page.
 //
 // Caching:
 //  - App code (html, js, css, manifest): network first, cached copy when offline -> always fresh when online.
 //  - Icons, fonts and the Firebase SDK (versioned URLs): cache first.
-const VERSION = "0.9.2";
+const VERSION = "0.9.3";
 const CACHE = "productivity-starter-" + VERSION;
 const SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./cloud.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));
+  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("message", (event) => {

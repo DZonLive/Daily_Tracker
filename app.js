@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.9.2";
+const APP_VERSION="0.9.3";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -38,7 +38,8 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  errDomain:"This site isn't allowed in Firebase yet (Authorized domains).",errProvider:"This sign-in method isn't enabled in Firebase yet.",errNetwork:"No internet connection.",
  errPopup:"The Google window couldn't open here. Try signing in with email instead.",errTooMany:"Too many attempts. Wait a bit and try again.",errGeneric:"Sign-in failed: {e}",
  updateText:"A new version is available",updateBtn:"Update",
- install:"Get the app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
+ share:"Share",shareTitle:"Share the app",shareLead:"Send this link to a friend. They get their own empty tracker; your data stays private.",shareText:"Productivity Starter — a simple tracker for study, work, workouts and rest.",copyLink:"Copy",linkCopied:"Link copied ✓",copyManual:"Select the link and copy it.",
+ install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
  inst_android:"Android (Chrome)",inst_android_steps:["Tap the <b>⋮</b> menu in the top-right corner.","Tap <b>Install app</b> (or <b>Add to Home screen</b> → <b>Install</b>).","Confirm. The app appears with your other apps."],
@@ -85,7 +86,8 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  errDomain:"Этот сайт ещё не разрешён в Firebase (Authorized domains).",errProvider:"Этот способ входа ещё не включён в Firebase.",errNetwork:"Нет подключения к интернету.",
  errPopup:"Окно Google здесь не открывается. Попробуй войти по почте.",errTooMany:"Слишком много попыток. Подожди немного и попробуй снова.",errGeneric:"Не удалось войти: {e}",
  updateText:"Доступна новая версия",updateBtn:"Обновить",
- install:"Скачать приложение",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
+ share:"Поделиться",shareTitle:"Поделиться приложением",shareLead:"Отправь эту ссылку другу. У него будет свой пустой трекер, твои данные останутся личными.",shareText:"Productivity Starter — простой трекер учёбы, работы, тренировок и отдыха.",copyLink:"Копировать",linkCopied:"Ссылка скопирована ✓",copyManual:"Выдели ссылку и скопируй её.",
+ install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
  inst_android:"Android (Chrome)",inst_android_steps:["Нажми меню <b>⋮</b> в правом верхнем углу.","Выбери <b>«Установить приложение»</b> (или <b>«Добавить на главный экран»</b> → <b>«Установить»</b>).","Подтверди. Приложение появится среди остальных."],
@@ -351,6 +353,20 @@ syncInstallBtn();
 (function(){if(PLATFORM.startsWith("ios")&&!isStandalone())$("iosHint").hidden=false})();
 const INST_ORDER=["ios","iosOther","android","samsung","desktop","macSafari","firefox"];
 function instBlock(k){const st=T("inst_"+k+"_steps");return `<div class="inst"><h4>${T("inst_"+k)}</h4><ol>${st.map(x=>`<li>${x}</li>`).join("")}</ol>${T("inst_"+k+"_note")!=="inst_"+k+"_note"?`<p class="note">${T("inst_"+k+"_note")}</p>`:""}</div>`}
+// ---------- share ----------
+const APP_URL=new URL("./",location.href).href;
+async function shareApp(){
+  const data={title:"Productivity Starter",text:T("shareText"),url:APP_URL};
+  if(navigator.share){
+    try{await navigator.share(data);return}catch(e){if(e&&e.name==="AbortError")return}
+  }
+  let ok=false;
+  try{await navigator.clipboard.writeText(APP_URL);ok=true}catch(e){}
+  $("shareUrl").value=APP_URL;$("shareCopied").textContent=ok?T("linkCopied"):"";
+  try{$("shareDlg").showModal()}catch(e){$("shareDlg").setAttribute("open","")}
+  if(!ok){$("shareUrl").focus();$("shareUrl").select()}
+}
+
 async function openInstall(){
   if(deferredInstall){
     const ev=deferredInstall;deferredInstall=null;
@@ -362,22 +378,24 @@ async function openInstall(){
 }
 
 // Service worker: offline support + "new version" banner.
+// A new version activates by itself. The banner appears only when it arrives while this page is
+// already open (the page still runs the old code); after any reload the page is current and no banner shows.
 if("serviceWorker" in navigator&&location.protocol!=="file:"){
-  let reloading=false;
-  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloading)return;reloading=true;location.reload()});
+  const hadController=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadController)$("updateBar").hidden=false});
+  $("updateBtn").addEventListener("click",()=>{flushNote();location.reload()});
   window.addEventListener("load",async()=>{
     try{
       const reg=await navigator.serviceWorker.register("sw.js",{updateViaCache:"none"});
-      const offer=()=>{if(reg.waiting&&navigator.serviceWorker.controller)$("updateBar").hidden=false};
-      offer();
-      reg.addEventListener("updatefound",()=>{const w=reg.installing;if(w)w.addEventListener("statechange",()=>{if(w.state==="installed")offer()})});
-      $("updateBtn").addEventListener("click",()=>{flushNote();if(reg.waiting)reg.waiting.postMessage("skipWaiting");else location.reload()});
+      // an older version may still be waiting from before this fix: let it take over
+      if(reg.waiting)reg.waiting.postMessage("skipWaiting");
       // check for updates when the app comes back to the foreground, at most every 30 min
       let last=Date.now();
       document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&Date.now()-last>30*60e3){last=Date.now();reg.update().catch(()=>{})}});
     }catch(e){}
   });
 }
+
 
 // ---------- actions ----------
 async function saveDay(date){try{await (store&&store.saveDay(date))}catch(err){showMsg(T("notSaved",{e:err.message||err.code||"error"}),true)}}
@@ -691,6 +709,9 @@ document.addEventListener("click",async ev=>{
     case "migrateBtn":migrateLocal();break;
     case "installBtn":openInstall();break;
     case "instClose":$("installDlg").close();break;
+    case "shareBtn":shareApp();break;
+    case "shareClose":$("shareDlg").close();break;
+    case "shareCopy":{try{await navigator.clipboard.writeText(APP_URL);$("shareCopied").textContent=T("linkCopied")}catch(e){$("shareUrl").select();$("shareCopied").textContent=T("copyManual")}break}
     case "addBtn":{
       if(!S.cat)return;
       const raw=$("durIn").value;let min=raw.trim()?parseDur(raw):S.dur;
@@ -726,6 +747,7 @@ $("taskIn").addEventListener("keydown",e=>{if(e.key==="Enter")addTask()});
 $("acctPass").addEventListener("keydown",e=>{if(e.key==="Enter")doAuth("in")});
 $("acct").addEventListener("click",e=>{if(e.target===$("acct"))$("acct").close()});
 $("installDlg").addEventListener("click",e=>{if(e.target===$("installDlg"))$("installDlg").close()});
+$("shareDlg").addEventListener("click",e=>{if(e.target===$("shareDlg"))$("shareDlg").close()});
 $("ncName").addEventListener("keydown",e=>{if(e.key==="Enter")$("ncAdd").click()});
 $("noteArea").addEventListener("input",e=>{
   const date=S.sel;setDay(date,{note:e.target.value});noteDirty={date};$("noteSaved").textContent=T("saving");

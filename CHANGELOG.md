@@ -3,6 +3,11 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.9.3 (beta) — 2026-11-05
+- Fix: the "new version" bar no longer stays on screen after reloading; updates apply on the next reload
+- New: Share button in the header (phone share sheet or copy link)
+- Sign-in stays saved on the device across restarts and updates (documented)
+
 ## 0.9.2 (beta) — 2026-11-05
 - "Get the app" button is now always visible: one-tap install in Chrome/Edge, step-by-step instructions on iPhone, Mac Safari, Android and other browsers
 

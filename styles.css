@@ -319,3 +319,8 @@ dialog#acct::backdrop,dialog.sheet::backdrop{background:rgba(10,12,18,.55)}
 .inst-more summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted)}
 #instAll{display:grid;gap:14px;margin-top:12px}
 #instAll .inst{padding-top:12px;border-top:1px solid var(--line)}
+
+.sharebtn{color:var(--ink)}
+#shareUrl{height:40px;font-size:13px}
+.lbl-short{display:none}
+@media (max-width:460px){.lbl-long{display:none}.lbl-short{display:inline}}
