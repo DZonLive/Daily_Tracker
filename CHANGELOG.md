@@ -3,6 +3,9 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.9.2 (beta) — 2026-11-05
+- "Get the app" button is now always visible: one-tap install in Chrome/Edge, step-by-step instructions on iPhone, Mac Safari, Android and other browsers
+
 ## 0.9.1 (beta) — 2026-11-05
 - Security: signing out now also deletes the offline copy of your data from this browser
 

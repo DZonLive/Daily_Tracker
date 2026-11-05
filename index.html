@@ -33,7 +33,7 @@
         <button class="iconbtn" id="next" data-ta="nextDay">›</button>
         <button class="chipbtn" id="today" data-t="today"></button>
       </div>
-      <button class="installbtn" id="installBtn" hidden data-t="install"></button>
+      <button class="installbtn" id="installBtn" type="button"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="install"></span></button>
       <button class="acctbtn" id="acctBtn" type="button">…</button>
       <div class="lang" role="group" aria-label="Language">
         <button type="button" data-lang="en" id="lang-en">EN</button>
@@ -220,6 +220,18 @@
       <button class="ghost" id="signOutBtn" data-t="signOut"></button>
     </div>
     <div class="datamsg" id="acctMsg"></div>
+  </div>
+</dialog>
+
+<dialog id="installDlg" class="sheet" aria-labelledby="instTitle">
+  <div class="dlg">
+    <div class="dlg-head"><h2 id="instTitle" data-t="instTitle"></h2><button class="del" id="instClose" data-ta="close">×</button></div>
+    <p class="lead" data-t="instLead"></p>
+    <div class="inst-main" id="instMain"></div>
+    <details class="inst-more">
+      <summary data-t="instOther"></summary>
+      <div id="instAll"></div>
+    </details>
   </div>
 </dialog>
 

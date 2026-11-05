@@ -265,7 +265,7 @@ table.wt .nt{color:var(--muted);overflow-wrap:anywhere}
 
 /* Data & install panel (standalone app only) */
 .datarow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.installbtn{height:36px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:13px;padding:0 14px}
+.installbtn{height:36px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:13px;padding:0 14px;display:inline-flex;align-items:center;gap:7px}
 .filebtn{position:relative;overflow:hidden;display:inline-flex;align-items:center}
 .filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .datamsg{font-size:13px;color:var(--muted);margin-top:8px;min-height:18px}
@@ -280,8 +280,8 @@ table.wt .nt{color:var(--muted);overflow-wrap:anywhere}
 .acctbtn.avatar{padding:0;width:36px;border-radius:50%;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-size:15px}
 
 /* Account dialog */
-dialog#acct{border:1px solid var(--line);border-radius:16px;padding:0;background:var(--panel);color:var(--ink);width:min(420px,calc(100vw - 32px));max-height:calc(100vh - 32px)}
-dialog#acct::backdrop{background:rgba(10,12,18,.55)}
+dialog#acct,dialog.sheet{border:1px solid var(--line);border-radius:16px;padding:0;background:var(--panel);color:var(--ink);width:min(420px,calc(100vw - 32px));max-height:calc(100vh - 32px)}
+dialog#acct::backdrop,dialog.sheet::backdrop{background:rgba(10,12,18,.55)}
 .dlg{padding:20px;display:grid;gap:12px}
 .dlg-head{display:flex;justify-content:space-between;align-items:center}
 .dlg h2{font-family:var(--f-display);font-weight:500;font-size:16px;margin:0}
@@ -310,3 +310,12 @@ dialog#acct::backdrop{background:rgba(10,12,18,.55)}
 
 .foot{max-width:1000px;margin:24px auto 0;text-align:center;font-size:12px;color:var(--muted)}
 .foot a{color:inherit}
+
+/* Install dialog */
+.inst-main{border-radius:12px;background:color-mix(in srgb,var(--accent) 8%,var(--panel));padding:14px 16px}
+.inst h4{margin:0 0 8px;font-size:14px}
+.inst ol{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14px}
+.inst .note{margin:8px 0 0;font-size:12px;color:var(--muted)}
+.inst-more summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted)}
+#instAll{display:grid;gap:14px;margin-top:12px}
+#instAll .inst{padding-top:12px;border-top:1px solid var(--line)}

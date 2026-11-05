@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.9.1";
+const APP_VERSION="0.9.2";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -38,7 +38,15 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  errDomain:"This site isn't allowed in Firebase yet (Authorized domains).",errProvider:"This sign-in method isn't enabled in Firebase yet.",errNetwork:"No internet connection.",
  errPopup:"The Google window couldn't open here. Try signing in with email instead.",errTooMany:"Too many attempts. Wait a bit and try again.",errGeneric:"Sign-in failed: {e}",
  updateText:"A new version is available",updateBtn:"Update",
- install:"Install app",dataTitle:"Data & backup",dataWhere:"stored on this device",exportBtn:"Export backup",importBtn:"Import backup",
+ install:"Get the app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
+ inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
+ inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
+ inst_android:"Android (Chrome)",inst_android_steps:["Tap the <b>⋮</b> menu in the top-right corner.","Tap <b>Install app</b> (or <b>Add to Home screen</b> → <b>Install</b>).","Confirm. The app appears with your other apps."],
+ inst_samsung:"Android (Samsung Internet)",inst_samsung_steps:["Tap the <b>☰</b> menu at the bottom.","Tap <b>Add page to</b> → <b>Home screen</b>."],
+ inst_desktop:"Computer (Chrome / Edge)",inst_desktop_steps:["Look for the <b>install icon</b> (a monitor with an arrow) at the right end of the address bar and click it.","No icon? Open the browser menu <b>⋮</b> / <b>…</b> and find <b>Install Productivity Starter</b> (in Chrome it may be under <b>Cast, save and share</b>; in Edge under <b>Apps</b>).","Click <b>Install</b>. The app opens in its own window and gets a shortcut."],
+ inst_macSafari:"Mac (Safari)",inst_macSafari_steps:["In the menu bar choose <b>File</b> → <b>Add to Dock</b>.","Click <b>Add</b>. The app appears in your Dock."],inst_macSafari_note:"Needs macOS Sonoma or newer. On older versions use Chrome or Edge.",
+ inst_firefox:"Firefox",inst_firefox_steps:["Firefox on computers can't install web apps.","Open this page in <b>Chrome</b> or <b>Edge</b> and install it from there. Your data syncs once you sign in."],
+dataTitle:"Data & backup",dataWhere:"stored on this device",exportBtn:"Export backup",importBtn:"Import backup",
  dataHint:"A backup is a file you keep just in case. Signed out, Import replaces the data on this device; signed in, it adds the backup to your account.",
  iosHint:"iPhone: open this page in Safari, tap Share, then “Add to Home Screen” to install it as an app.",
  exported:"Backup saved: {f}",imported:"Imported: {n} days",importBad:"That file isn't a Productivity Starter backup.",storageFull:"Couldn't save: device storage is full or blocked.",
@@ -77,7 +85,15 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  errDomain:"Этот сайт ещё не разрешён в Firebase (Authorized domains).",errProvider:"Этот способ входа ещё не включён в Firebase.",errNetwork:"Нет подключения к интернету.",
  errPopup:"Окно Google здесь не открывается. Попробуй войти по почте.",errTooMany:"Слишком много попыток. Подожди немного и попробуй снова.",errGeneric:"Не удалось войти: {e}",
  updateText:"Доступна новая версия",updateBtn:"Обновить",
- install:"Установить",dataTitle:"Данные и резервная копия",dataWhere:"хранятся на этом устройстве",exportBtn:"Скачать копию",importBtn:"Загрузить копию",
+ install:"Скачать приложение",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
+ inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
+ inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
+ inst_android:"Android (Chrome)",inst_android_steps:["Нажми меню <b>⋮</b> в правом верхнем углу.","Выбери <b>«Установить приложение»</b> (или <b>«Добавить на главный экран»</b> → <b>«Установить»</b>).","Подтверди. Приложение появится среди остальных."],
+ inst_samsung:"Android (Samsung Internet)",inst_samsung_steps:["Нажми меню <b>☰</b> внизу.","Выбери <b>«Добавить страницу на»</b> → <b>«Главный экран»</b>."],
+ inst_desktop:"Компьютер (Chrome / Edge)",inst_desktop_steps:["Найди <b>значок установки</b> (монитор со стрелкой) справа в адресной строке и нажми на него.","Нет значка? Открой меню браузера <b>⋮</b> / <b>…</b> и найди <b>«Установить Productivity Starter»</b> (в Chrome может быть в разделе <b>«Трансляция, сохранение и отправка»</b>, в Edge в разделе <b>«Приложения»</b>).","Нажми <b>«Установить»</b>. Приложение откроется в отдельном окне и получит ярлык."],
+ inst_macSafari:"Mac (Safari)",inst_macSafari_steps:["В строке меню выбери <b>«Файл»</b> → <b>«Добавить в Dock»</b>.","Нажми <b>«Добавить»</b>. Приложение появится в Dock."],inst_macSafari_note:"Нужна macOS Sonoma или новее. На более старых версиях используй Chrome или Edge.",
+ inst_firefox:"Firefox",inst_firefox_steps:["Firefox на компьютере не умеет устанавливать веб-приложения.","Открой эту страницу в <b>Chrome</b> или <b>Edge</b> и установи оттуда. После входа данные синхронизируются."],
+dataTitle:"Данные и резервная копия",dataWhere:"хранятся на этом устройстве",exportBtn:"Скачать копию",importBtn:"Загрузить копию",
  dataHint:"Копия — это файл на всякий случай. Без входа «Загрузить копию» заменяет данные на устройстве, а со входом добавляет их в аккаунт.",
  iosHint:"iPhone: открой эту страницу в Safari, нажми «Поделиться», затем «На экран „Домой“», чтобы установить как приложение.",
  exported:"Копия сохранена: {f}",imported:"Загружено дней: {n}",importBad:"Это не файл резервной копии Productivity Starter.",storageFull:"Не удалось сохранить: память устройства заполнена или недоступна.",
@@ -314,14 +330,37 @@ function importBackup(file){
 function dataMsg(t,kind){const m=$("dataMsg");m.textContent=t;m.className="datamsg"+(kind?" "+kind:"")}
 
 // ---------- install / offline ----------
+// The "Get the app" button is always visible (except inside the installed app).
+// Chrome/Edge: it opens the browser's own install prompt. Other browsers can't be triggered
+// from a page, so it shows short steps for the device instead.
 let deferredInstall=null;
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("installBtn").hidden=false});
-window.addEventListener("appinstalled",()=>{deferredInstall=null;$("installBtn").hidden=true});
-(function(){
-  const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
-  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-  if(ios&&!standalone)$("iosHint").hidden=false;
+const UA=navigator.userAgent;
+const PLATFORM=(()=>{
+  const ios=/iphone|ipad|ipod/i.test(UA)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  if(ios)return /CriOS|FxiOS|EdgiOS|OPiOS|YaBrowser/i.test(UA)?"iosOther":"ios";
+  if(/android/i.test(UA))return /SamsungBrowser/i.test(UA)?"samsung":"android";
+  if(/Firefox\//.test(UA))return "firefox";
+  if(/Macintosh/.test(UA)&&/Safari\//.test(UA)&&!/Chrome|Chromium|Edg\//.test(UA))return "macSafari";
+  return "desktop";
 })();
+const isStandalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+function syncInstallBtn(){$("installBtn").hidden=isStandalone()}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e});
+window.addEventListener("appinstalled",()=>{deferredInstall=null;try{$("installDlg").close()}catch(e){}syncInstallBtn()});
+syncInstallBtn();
+(function(){if(PLATFORM.startsWith("ios")&&!isStandalone())$("iosHint").hidden=false})();
+const INST_ORDER=["ios","iosOther","android","samsung","desktop","macSafari","firefox"];
+function instBlock(k){const st=T("inst_"+k+"_steps");return `<div class="inst"><h4>${T("inst_"+k)}</h4><ol>${st.map(x=>`<li>${x}</li>`).join("")}</ol>${T("inst_"+k+"_note")!=="inst_"+k+"_note"?`<p class="note">${T("inst_"+k+"_note")}</p>`:""}</div>`}
+async function openInstall(){
+  if(deferredInstall){
+    const ev=deferredInstall;deferredInstall=null;
+    try{ev.prompt();const r=await ev.userChoice;if(r&&r.outcome==="accepted")return}catch(e){}
+  }
+  $("instMain").innerHTML=instBlock(PLATFORM);
+  $("instAll").innerHTML=INST_ORDER.filter(k=>k!==PLATFORM&&k!=="iosOther").map(instBlock).join("");
+  try{$("installDlg").showModal()}catch(e){$("installDlg").setAttribute("open","")}
+}
+
 // Service worker: offline support + "new version" banner.
 if("serviceWorker" in navigator&&location.protocol!=="file:"){
   let reloading=false;
@@ -650,7 +689,8 @@ document.addEventListener("click",async ev=>{
     case "resetBtn":doAuth("reset");break;
     case "signOutBtn":flushNote();if(cloud){$("signOutBtn").disabled=true;cloud.signOut().finally(()=>location.reload())}break;
     case "migrateBtn":migrateLocal();break;
-    case "installBtn":if(deferredInstall){deferredInstall.prompt();deferredInstall.userChoice.finally(()=>{deferredInstall=null;$("installBtn").hidden=true})}break;
+    case "installBtn":openInstall();break;
+    case "instClose":$("installDlg").close();break;
     case "addBtn":{
       if(!S.cat)return;
       const raw=$("durIn").value;let min=raw.trim()?parseDur(raw):S.dur;
@@ -685,6 +725,7 @@ document.addEventListener("change",e=>{
 $("taskIn").addEventListener("keydown",e=>{if(e.key==="Enter")addTask()});
 $("acctPass").addEventListener("keydown",e=>{if(e.key==="Enter")doAuth("in")});
 $("acct").addEventListener("click",e=>{if(e.target===$("acct"))$("acct").close()});
+$("installDlg").addEventListener("click",e=>{if(e.target===$("installDlg"))$("installDlg").close()});
 $("ncName").addEventListener("keydown",e=>{if(e.key==="Enter")$("ncAdd").click()});
 $("noteArea").addEventListener("input",e=>{
   const date=S.sel;setDay(date,{note:e.target.value});noteDirty={date};$("noteSaved").textContent=T("saving");
