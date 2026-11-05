@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.9.3";
+const APP_VERSION="0.10.0";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -39,6 +39,9 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  errPopup:"The Google window couldn't open here. Try signing in with email instead.",errTooMany:"Too many attempts. Wait a bit and try again.",errGeneric:"Sign-in failed: {e}",
  updateText:"A new version is available",updateBtn:"Update",
  share:"Share",shareTitle:"Share the app",shareLead:"Send this link to a friend. They get their own empty tracker; your data stays private.",shareText:"Productivity Starter — a simple tracker for study, work, workouts and rest.",copyLink:"Copy",linkCopied:"Link copied ✓",copyManual:"Select the link and copy it.",
+ income:"Income",incMonthTotal:"Earned this month",statWeek:"This week",statPerHour:"Per hour of work",perHourHint:"month income ÷ hours in “{c}”",statBest:"Best day",earnDays:"{n} paid days",
+ addIncome:"Add income for {d}",amountPh:"Amount",srcPh:"Source (optional): job, client, gig…",noIncome:"No income on this day.",grossNote:"before taxes",
+ incGoal:"Monthly income goal",goalHint:"empty or 0 = no goal",incGoalLeft:"{a} left to {b}",incGoalDone:"Goal reached ✓ {b}",badAmount:"Enter an amount, e.g. 85 or 120.50",incAdded:"Added {a}",dayIncome:"earned {a}",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -87,6 +90,9 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  errPopup:"Окно Google здесь не открывается. Попробуй войти по почте.",errTooMany:"Слишком много попыток. Подожди немного и попробуй снова.",errGeneric:"Не удалось войти: {e}",
  updateText:"Доступна новая версия",updateBtn:"Обновить",
  share:"Поделиться",shareTitle:"Поделиться приложением",shareLead:"Отправь эту ссылку другу. У него будет свой пустой трекер, твои данные останутся личными.",shareText:"Productivity Starter — простой трекер учёбы, работы, тренировок и отдыха.",copyLink:"Копировать",linkCopied:"Ссылка скопирована ✓",copyManual:"Выдели ссылку и скопируй её.",
+ income:"Доход",incMonthTotal:"Заработано за месяц",statWeek:"За неделю",statPerHour:"За час работы",perHourHint:"доход за месяц ÷ часы в «{c}»",statBest:"Лучший день",earnDays:"дней с доходом: {n}",
+ addIncome:"Добавить доход за {d}",amountPh:"Сумма",srcPh:"Откуда (необязательно): работа, клиент, подработка…",noIncome:"За этот день дохода нет.",grossNote:"до налогов",
+ incGoal:"Цель по доходу на месяц",goalHint:"пусто или 0 — без цели",incGoalLeft:"до {b} осталось {a}",incGoalDone:"Цель достигнута ✓ {b}",badAmount:"Введи сумму, например 85 или 120.50",incAdded:"Добавлено {a}",dayIncome:"заработано {a}",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -123,7 +129,7 @@ const S={
   days:{},          // date -> {entries:[], tasks:[], note:""}
   cats:DEFAULT_CATS.map(c=>({...c})),
   goals:{...DEF_DAY}, wgoals:{...DEF_WEEK}, goalMode:"week",
-  timer:null, sel:todayStr(), month:null, cat:"study", dur:null, newColor:"sky", streakMin:60, wdRange:"auto",
+  timer:null, sel:todayStr(), month:null, cat:"study", dur:null, newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0,
 };
 S.month=monthOf(S.sel);
 
@@ -163,11 +169,12 @@ function parseDur(raw){
 }
 
 // ---------- day data ----------
-function day(date){return S.days[date]||{entries:[],tasks:[],note:""}}
+function day(date){const d=S.days[date];return d?(d.income?d:{...d,income:[]}):{entries:[],tasks:[],note:"",income:[]}}
 function setDay(date,patch){S.days={...S.days,[date]:{...day(date),...patch}}}
 function normDay(v){
-  if(Array.isArray(v))return {entries:v,tasks:[],note:""};
-  return {entries:Array.isArray(v&&v.entries)?v.entries.slice():[],tasks:Array.isArray(v&&v.tasks)?v.tasks.slice():[],note:typeof(v&&v.note)==="string"?v.note:""};
+  if(Array.isArray(v))return {entries:v,tasks:[],note:"",income:[]};
+  const arr=k=>Array.isArray(v&&v[k])?v[k].slice():[];
+  return {entries:arr("entries"),tasks:arr("tasks"),note:typeof(v&&v.note)==="string"?v.note:"",income:arr("income").filter(x=>x&&isFinite(+x.amount))};
 }
 
 // ---------- storage ----------
@@ -182,7 +189,7 @@ let user=null;           // {uid,email,name} when signed in
 let unsub=null;          // stops cloud listeners
 let lastSettingsJSON=""; // avoid re-writing settings that came from the server
 function queued(key,fn){const p=(queues[key]||Promise.resolve()).then(fn,fn);queues[key]=p.catch(()=>{});return p}
-function settingsBody(){return {type:"settings",cats:S.cats,goals:S.goals,wgoals:S.wgoals,goalMode:S.goalMode,timer:S.timer,lang:LANG,streakMin:S.streakMin}}
+function settingsBody(){return {type:"settings",cats:S.cats,goals:S.goals,wgoals:S.wgoals,goalMode:S.goalMode,timer:S.timer,lang:LANG,streakMin:S.streakMin,incomeGoal:S.incomeGoal}}
 function applySettings(v){
   if(!v)return;
   if(Array.isArray(v.cats)&&v.cats.length)S.cats=v.cats.map(c=>({...c}));
@@ -191,12 +198,13 @@ function applySettings(v){
   if(v.goalMode==="day"||v.goalMode==="week")S.goalMode=v.goalMode;
   S.timer=v.timer||null;
   if(+v.streakMin>0)S.streakMin=+v.streakMin;
+  if(v.incomeGoal!=null&&isFinite(+v.incomeGoal))S.incomeGoal=Math.max(0,+v.incomeGoal);
   // language is a per-device choice; take it from the data only if this device hasn't picked one
   let chosen=null;try{chosen=localStorage.getItem("ps-lang")}catch(e){}
   if(!chosen&&(v.lang==="ru"||v.lang==="en")&&v.lang!==LANG){LANG=v.lang;try{localStorage.setItem("ps-lang",LANG)}catch(e){}}
 }
 function readLocal(){try{const raw=localStorage.getItem(LOCAL_KEY);return raw?JSON.parse(raw):null}catch(e){return null}}
-function localDaysCount(){const d=readLocal();return d&&d.days?Object.keys(d.days).filter(k=>{const v=normDay(d.days[k]);return v.entries.length||v.tasks.length||v.note.trim()}).length:0}
+function localDaysCount(){const d=readLocal();return d&&d.days?Object.keys(d.days).filter(k=>{const v=normDay(d.days[k]);return v.entries.length||v.tasks.length||v.income.length||v.note.trim()}).length:0}
 function localStore(){
   const d=readLocal();
   S.days={};if(d){for(const k in (d.days||{}))S.days[k]=normDay(d.days[k]);applySettings(d)}
@@ -230,7 +238,7 @@ function startCloud(u){
   };
   unsub=cloud.subscribe(u.uid,(days,m)=>{
     const next={};for(const k in days)next[k]=normDay(days[k]);
-    if(noteDirty){next[noteDirty.date]={...(next[noteDirty.date]||{entries:[],tasks:[],note:""}),note:day(noteDirty.date).note}}
+    if(noteDirty){next[noteDirty.date]={...(next[noteDirty.date]||{entries:[],tasks:[],note:"",income:[]}),note:day(noteDirty.date).note}}
     S.days=next;gotDays=true;status(m);render();
   },(v,m)=>{
     if(v){const j=JSON.stringify({...v,updatedAt:undefined});if(j!==lastSettingsJSON){applySettings(v);render()}}
@@ -293,7 +301,7 @@ async function doAuth(kind){
 async function migrateLocal(){
   if(!cloud||!user)return;
   const d=readLocal();if(!d||!d.days)return;
-  const days={};for(const k in d.days){const v=normDay(d.days[k]);if(v.entries.length||v.tasks.length||v.note.trim())days[k]=v}
+  const days={};for(const k in d.days){const v=normDay(d.days[k]);if(v.entries.length||v.tasks.length||v.income.length||v.note.trim())days[k]=v}
   $("migrateBtn").disabled=true;
   try{
     const n=await cloud.mergeDays(user.uid,days);
@@ -486,6 +494,7 @@ function render(){
   renderWeek();
   renderStreak();
   renderWeekDetail();
+  renderIncome();
   renderCatManager();
 }
 function sortedEntries(date){
@@ -598,6 +607,61 @@ function renderStreak(){
     <div class="sdots" aria-hidden="true">${dots}</div>`;
 }
 
+// ---------- income ----------
+const fmtMoney=(x,cents)=>{x=Math.round((x||0)*100)/100;const f=cents||Math.round(x)!==x?2:0;return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:f,maximumFractionDigits:f}).format(x)};
+const dayIncome=date=>(day(date).income||[]).reduce((a,x)=>a+(+x.amount||0),0);
+const monthDays=m=>{const d=parse(m),n=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();return [...Array(n)].map((_,i)=>m.slice(0,8)+pad(i+1))};
+function parseAmount(raw){const s=String(raw||"").replace(/[$\s]/g,"").replace(",",".");if(!/^\d+(\.\d{1,2})?$/.test(s))return NaN;const v=+s;return v>0&&v<1e6?Math.round(v*100)/100:NaN}
+function renderIncome(){
+  const m=S.month,days=monthDays(m),today=todayStr(),sel=S.sel;
+  $("incMonth").textContent=cap(fMonth().format(parse(m)).replace(" г.",""));
+  const vals=days.map(dayIncome),total=vals.reduce((a,b)=>a+b,0);
+  $("incMonthTotal").textContent=fmtMoney(total);
+  // goal
+  const g=+S.incomeGoal||0;
+  $("incGoalBox").innerHTML=g?`<div class="incgoal"><div class="bar"><i style="width:${Math.min(100,total/g*100)}%"></i></div><span>${total>=g?T("incGoalDone",{b:"<b>"+fmtMoney(g)+"</b>"}):T("incGoalLeft",{a:"<b>"+fmtMoney(g-total)+"</b>",b:fmtMoney(g)})}</span></div>`:"";
+  // stats
+  const ws=weekStart(sel);let wk=0;for(let i=0;i<7;i++)wk+=dayIncome(addDays(ws,i));
+  let workMin=0;days.forEach(d=>{workMin+=dayTotals(d).work||0});
+  const perH=workMin>=30?total/(workMin/60):null;
+  let best=-1,bestD=null;vals.forEach((v,i)=>{if(v>best&&v>0){best=v;bestD=days[i]}});
+  const earnDays=vals.filter(v=>v>0).length;
+  const st=(k,v,sub)=>`<div class="istat"><span class="k">${k}</span><span class="v">${v}</span>${sub?`<span class="s">${sub}</span>`:""}</div>`;
+  $("incStats").innerHTML=
+     st(sel===today?T("today"):cap(fDay().format(parse(sel))),fmtMoney(dayIncome(sel)))
+    +st(T("statWeek"),fmtMoney(wk),fD().format(parse(ws))+" – "+fD().format(parse(addDays(ws,6))))
+    +st(T("statPerHour"),perH!=null?fmtMoney(perH,true):"—",T("perHourHint",{c:esc(catInfo("work").name)}))
+    +st(T("statBest"),bestD?fmtMoney(best):"—",bestD?fD().format(parse(bestD))+" · "+T("earnDays",{n:earnDays}):"");
+  // chart
+  const max=Math.max(...vals,0);
+  const step=(()=>{if(!max)return 50;const raw=max/3,p=Math.pow(10,Math.floor(Math.log10(raw)));return [1,2,2.5,5,10].map(x=>x*p).find(x=>x>=raw)})();
+  const top=Math.max(step,Math.ceil(max/step)*step);
+  let grid="";for(let v=0;v<=top+1e-9;v+=step)grid+=`<div style="bottom:${v/top*100}%"><span>${fmtMoney(v)}</span></div>`;
+  const lbl=new Set([1,5,10,15,20,25,days.length]);
+  const cols=days.map((d,i)=>{const v=vals[i],n=i+1;const cls=["mcol"];if(!v)cls.push("zero");if(d===today)cls.push("today");if(d===sel)cls.push("sel");if(lbl.has(n))cls.push("lbl");
+    return `<button type="button" class="${cls.join(" ")}" data-day="${d}" title="${fD().format(parse(d))}: ${fmtMoney(v,true)}"><span class="b" style="height:${v/top*150}px"></span><span class="mlab">${n}</span></button>`}).join("");
+  $("mchart").innerHTML=`<div class="grid">${grid}</div><div class="mcols" style="grid-template-columns:repeat(${days.length},minmax(0,1fr))">${cols}</div>`;
+  // add + list for the selected day
+  $("incAddTitle").textContent=T("addIncome",{d:sel===today?T("today").toLowerCase():fD().format(parse(sel))});
+  const list=day(sel).income||[];
+  $("incList").innerHTML=list.length?list.map(x=>`<li><span class="amt">${fmtMoney(+x.amount,true)}</span><span class="tx">${esc(x.src)}</span><button class="del" data-idel="${x.id}" aria-label="×">×</button></li>`).join(""):`<li class="empty">${T("noIncome")}</li>`;
+  const srcs=[];Object.keys(S.days).sort().reverse().forEach(k=>(day(k).income||[]).forEach(x=>{if(x.src&&!srcs.includes(x.src))srcs.push(x.src)}));
+  $("incSrcList").innerHTML=srcs.slice(0,20).map(x=>`<option value="${esc(x)}"></option>`).join("");
+  const gi=$("incGoal");if(document.activeElement!==gi)gi.value=g||"";
+  // day summary line
+  const di=dayIncome(sel);$("dayIncome").textContent=di?"· "+T("dayIncome",{a:fmtMoney(di)}):"";
+}
+function addIncome(){
+  const a=parseAmount($("incAmt").value);
+  if(!isFinite(a)){incMsg(T("badAmount"),"err");$("incAmt").focus();return}
+  const src=$("incSrc").value.trim().slice(0,40);
+  const date=S.sel;
+  setDay(date,{income:[...(day(date).income||[]),{id:uid(),amount:a,src,at:Date.now()}]});
+  $("incAmt").value="";$("incSrc").value="";
+  render();saveDay(date);incMsg(T("incAdded",{a:fmtMoney(a,true)}),"ok");
+}
+function incMsg(t,k){const m=$("incMsg");m.textContent=t;m.className="datamsg"+(k?" "+k:"");clearTimeout(incMsg.t);incMsg.t=setTimeout(()=>{m.textContent=""},3000)}
+
 // ---------- week detail ----------
 function renderWeekDetail(){
   const ws=weekStart(S.sel),days=[...Array(7)].map((_,i)=>addDays(ws,i)),today=todayStr(),dow=I18N[LANG].dow;
@@ -672,6 +736,7 @@ document.addEventListener("click",async ev=>{
   if(ds.day){selectDay(ds.day);return}
   if(ds.wdr){S.wdRange=ds.wdr;renderWeekDetail();return}
   if(ds.mode){S.goalMode=ds.mode;render();saveSettings();return}
+  if(ds.idel){setDay(S.sel,{income:(day(S.sel).income||[]).filter(x=>x.id!==ds.idel)});render();saveDay(S.sel);return}
   if(ds.tdel){setDay(S.sel,{tasks:day(S.sel).tasks.filter(x=>x.id!==ds.tdel)});render();saveDay(S.sel);return}
   if(ds.mv){
     const from=S.sel,to=addDays(from,1);const tk=day(from).tasks.find(x=>x.id===ds.mv);if(!tk)return;
@@ -686,8 +751,8 @@ document.addEventListener("click",async ev=>{
     case "today":selectDay(todayStr());break;
     case "wPrev":selectDay(addDays(S.sel,-7));break;
     case "wNext":selectDay(addDays(S.sel,7));break;
-    case "mPrev":S.month=addMonths(S.month,-1);renderCalendar();break;
-    case "mNext":S.month=addMonths(S.month,1);renderCalendar();break;
+    case "mPrev":S.month=addMonths(S.month,-1);renderCalendar();renderIncome();break;
+    case "mNext":S.month=addMonths(S.month,1);renderCalendar();renderIncome();break;
     case "goNewCat":$("catsPanel").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});setTimeout(()=>$("ncName").focus({preventScroll:true}),300);break;
     case "ncAdd":{
       const name=$("ncName").value.trim();
@@ -698,6 +763,9 @@ document.addEventListener("click",async ev=>{
       const nextCol=COLORS.find(col=>!S.cats.some(c=>c.color===col));if(nextCol)S.newColor=nextCol;
       render();saveSettings();showCatMsg(T("catAdded",{c:name}));break;}
     case "taskAdd":addTask();break;
+    case "incAdd":addIncome();break;
+    case "iPrev":S.month=addMonths(S.month,-1);renderCalendar();renderIncome();break;
+    case "iNext":S.month=addMonths(S.month,1);renderCalendar();renderIncome();break;
     case "exportBtn":exportBackup();break;
     case "acctBtn":acctMsg("");renderAccount();try{$("acct").showModal()}catch(e){$("acct").setAttribute("open","")}break;
     case "acctClose":$("acct").close();break;
@@ -744,6 +812,8 @@ document.addEventListener("change",e=>{
   if(ds.cname){const v=e.target.value.trim();S.cats=S.cats.map(c=>{if(c.k!==ds.cname)return c;const n={...c};if(v&&v!==T("cat_"+c.k))n.name=v;else delete n.name;return n});render();saveSettings();return}
 });
 $("taskIn").addEventListener("keydown",e=>{if(e.key==="Enter")addTask()});
+["incAmt","incSrc"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")addIncome()}));
+let igT;$("incGoal").addEventListener("input",e=>{const v=Math.max(0,Math.round(+e.target.value||0));S.incomeGoal=v;renderIncome();clearTimeout(igT);igT=setTimeout(saveSettings,700)});
 $("acctPass").addEventListener("keydown",e=>{if(e.key==="Enter")doAuth("in")});
 $("acct").addEventListener("click",e=>{if(e.target===$("acct"))$("acct").close()});
 $("installDlg").addEventListener("click",e=>{if(e.target===$("installDlg"))$("installDlg").close()});

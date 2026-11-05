@@ -62,7 +62,7 @@
           <div class="label" data-t="totalLogged"></div>
           <div class="big" id="totalBig">0</div>
         </div>
-        <div class="ratio" id="ratio"></div>
+        <div class="ratio"><span id="ratio"></span><span class="dayinc" id="dayIncome"></span></div>
       </div>
       <div class="strip" id="strip"></div>
       <div class="cats" id="cats"></div>
@@ -147,6 +147,41 @@
       <summary data-t="showTable"></summary>
       <div class="tblwrap"><table class="wt" id="wt"></table></div>
     </details>
+  </section>
+
+  <section class="panel" id="incomePanel" aria-labelledby="incH">
+    <div class="panel-head"><h2 id="incH" data-t="income"></h2>
+      <div class="wdtools">
+        <button class="iconbtn" id="iPrev" data-ta="prevMonth">‹</button>
+        <span class="hint mono" id="incMonth" style="min-width:130px;text-align:center"></span>
+        <button class="iconbtn" id="iNext" data-ta="nextMonth">›</button>
+      </div>
+    </div>
+    <div class="inc-top">
+      <div class="inc-big">
+        <div class="label" data-t="incMonthTotal"></div>
+        <div class="big mono" id="incMonthTotal">$0</div>
+        <div id="incGoalBox"></div>
+      </div>
+      <div class="inc-stats" id="incStats"></div>
+    </div>
+    <div class="mchart" id="mchart"></div>
+    <div class="inc-add">
+      <h3><span id="incAddTitle"></span><span class="prog" data-t="grossNote"></span></h3>
+      <div class="row">
+        <label class="money"><span>$</span><input type="text" id="incAmt" inputmode="decimal" class="mono" data-tp="amountPh"></label>
+        <input type="text" id="incSrc" class="grow" list="incSrcList" maxlength="40" data-tp="srcPh">
+        <datalist id="incSrcList"></datalist>
+        <button class="primary" id="incAdd" data-t="add"></button>
+      </div>
+      <div class="datamsg" id="incMsg"></div>
+      <ul class="tasks inclist" id="incList"></ul>
+    </div>
+    <div class="streakset">
+      <label for="incGoal" data-t="incGoal"></label>
+      <label class="money small-money"><span>$</span><input type="number" id="incGoal" min="0" step="50" class="mono"></label>
+      <span class="hint" data-t="goalHint"></span>
+    </div>
   </section>
 
   <section class="panel" aria-labelledby="dataH">

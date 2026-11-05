@@ -3,8 +3,8 @@
 // (no internet on the very first visit), the app keeps working on this device only.
 //
 // Data layout in Firestore (protected by firestore.rules, each user sees only their own):
-//   users/{uid}/days/{YYYY-MM-DD}  -> { date, entries[], tasks[], note, updatedAt }
-//   users/{uid}/meta/settings      -> { cats[], goals{}, wgoals{}, goalMode, timer, lang, streakMin, updatedAt }
+//   users/{uid}/days/{YYYY-MM-DD}  -> { date, entries[], tasks[], income[], note, updatedAt }
+//   users/{uid}/meta/settings      -> { cats[], goals{}, wgoals{}, goalMode, timer, lang, streakMin, incomeGoal, updatedAt }
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 import {
@@ -83,9 +83,10 @@ export function subscribe(uid, onDays, onSettings, onError) {
 // Writes go to the local cache right away and reach the server when online.
 // The promises resolve only after the server confirms, so callers should not wait on them to update the screen.
 export function saveDay(uid, date, d) {
-  const empty = !d.entries.length && !d.tasks.length && !(d.note || "").trim();
+  const income = d.income || [];
+  const empty = !d.entries.length && !d.tasks.length && !income.length && !(d.note || "").trim();
   if (empty) return deleteDoc(dayRef(uid, date));
-  return setDoc(dayRef(uid, date), { date, entries: d.entries, tasks: d.tasks, note: d.note || "", updatedAt: serverTimestamp() });
+  return setDoc(dayRef(uid, date), { date, entries: d.entries, tasks: d.tasks, income, note: d.note || "", updatedAt: serverTimestamp() });
 }
 export function saveSettings(uid, s) {
   return setDoc(settingsRef(uid), { ...s, updatedAt: serverTimestamp() });
@@ -105,7 +106,7 @@ export async function mergeDays(uid, localDays) {
       const byId = (x, y) => { const m = new Map(); [...(y || []), ...(x || [])].forEach((e) => m.set(e.id, e)); return [...m.values()]; };
       const na = (a.note || "").trim(), nb = (b.note || "").trim();
       const note = !nb ? na : !na || na === nb ? nb : nb + "\n\n" + na;
-      batch.set(dayRef(uid, date), { date, entries: byId(a.entries, b.entries), tasks: byId(a.tasks, b.tasks), note, updatedAt: serverTimestamp() });
+      batch.set(dayRef(uid, date), { date, entries: byId(a.entries, b.entries), tasks: byId(a.tasks, b.tasks), income: byId(a.income, b.income), note, updatedAt: serverTimestamp() });
     });
     await batch.commit();
   }
