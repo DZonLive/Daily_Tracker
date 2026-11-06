@@ -3,6 +3,13 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.14.0 (beta) — 2026-11-06
+- "From – to" is now the first and default way to log time
+- × button to remove a goal (category goals and the monthly income goal)
+- Removed the "How the day went" timeline and the backup panel (moving pre-sign-in data to your account still appears when needed)
+- Smooth animations: button presses, pop-ups, wheel sheet, day switching (respects "reduce motion")
+- Phone: fast taps on the wheel arrows no longer zoom the page; inputs no longer zoom on iPhone
+
 ## 0.13.0 (beta) — 2026-11-06
 - Time is now picked with scroll wheels (like a phone alarm clock) in a pop-up: hours and minutes columns, arrows ▲ ▼, mouse wheel and keyboard. 24-hour format, no AM/PM.
 - Big tiles show the chosen duration / start / end; after picking the start, the end picker opens by itself; "Now" button in the picker

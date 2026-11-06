@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.13.0";
+const APP_VERSION="0.14.0";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -47,8 +47,9 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  incHow:"Income is added when you log time in {c}: pick the category, the duration and fill in “Earned”.",
  tmDur:"How long",tmRange:"From – to",hoursU:"h",minsU:"min",startedAt:"Started at",rStartL:"Start",rEndL:"End",nowBtn:"Now",
  pvDur:"Choose how long: tap Duration or a quick button",pvRange:"Set when you started and finished",pvNeedStart:"Set the start time",pvNeedEnd:"Set the end time",sameTimes:"Start and end are the same",
- pvJustNow:"ends now — set “Started at” if it was earlier",pvOvernight:"goes past midnight",pvNoTime:"no start time — counts in totals, not shown on the day timeline",
+ pvJustNow:"ends now — set “Started at” if it was earlier",pvOvernight:"goes past midnight",pvNoTime:"no start time — counts in totals, not shown in the week grid",
  durL:"Duration",tapToPick:"Tap to choose",optional:"optional",startedAtT:"Started at",clearTime:"No start time",cancel:"Cancel",done:"Done",
+ removeGoal:"Remove goal",goalRemoved:"Goal removed",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -105,8 +106,9 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  incHow:"Доход добавляется при записи времени в {c}: выбери категорию, длительность и заполни «Заработок».",
  tmDur:"Сколько времени",tmRange:"С … до …",hoursU:"ч",minsU:"мин",startedAt:"Начал в",rStartL:"Начало",rEndL:"Конец",nowBtn:"Сейчас",
  pvDur:"Выбери, сколько: нажми «Длительность» или быструю кнопку",pvRange:"Укажи, во сколько начал и закончил",pvNeedStart:"Укажи время начала",pvNeedEnd:"Укажи время конца",sameTimes:"Начало и конец совпадают",
- pvJustNow:"закончил только что — укажи «Начал в», если было раньше",pvOvernight:"через полночь",pvNoTime:"без времени начала — попадёт в итоги, но не на шкалу дня",
+ pvJustNow:"закончил только что — укажи «Начал в», если было раньше",pvOvernight:"через полночь",pvNoTime:"без времени начала — попадёт в итоги, но не в недельную сетку",
  durL:"Длительность",tapToPick:"Нажми, чтобы выбрать",optional:"необязательно",startedAtT:"Начал в",clearTime:"Без времени",cancel:"Отмена",done:"Готово",
+ removeGoal:"Убрать цель",goalRemoved:"Цель убрана",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -143,10 +145,10 @@ const S={
   days:{},          // date -> {entries:[], tasks:[], note:""}
   cats:DEFAULT_CATS.map(c=>({...c})),
   goals:{...DEF_DAY}, wgoals:{...DEF_WEEK}, goalMode:"week",
-  timer:null, sel:todayStr(), month:null, cat:"study", dh:0, dm:0, tmode:"dur", newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
+  timer:null, sel:todayStr(), month:null, cat:"study", dh:0, dm:0, tmode:"range", newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
 };
 S.month=monthOf(S.sel);
-try{const tm=localStorage.getItem("ps-tmode");if(tm==="dur"||tm==="range")S.tmode=tm}catch(e){}
+try{const tm=localStorage.getItem("ps-tmode2");if(tm==="dur"||tm==="range")S.tmode=tm}catch(e){}
 
 function catInfo(k){
   const c=S.cats.find(x=>x.k===k);
@@ -301,7 +303,6 @@ function renderAccount(){
   const n=user?localDaysCount():0;
   $("migrateBox").hidden=!n;
   if(n)$("migrateText").textContent=T("migrateText",{n});
-  $("syncNote").textContent=T(user?"syncOn":"syncOff");
 }
 async function doAuth(kind){
   if(!cloud)return;
@@ -375,7 +376,6 @@ function syncInstallBtn(){$("installBtn").hidden=isStandalone()}
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e});
 window.addEventListener("appinstalled",()=>{deferredInstall=null;try{$("installDlg").close()}catch(e){}syncInstallBtn()});
 syncInstallBtn();
-(function(){if(PLATFORM.startsWith("ios")&&!isStandalone())$("iosHint").hidden=false})();
 const INST_ORDER=["ios","iosOther","android","samsung","desktop","macSafari","firefox"];
 function instBlock(k){const st=T("inst_"+k+"_steps");return `<div class="inst"><h4>${T("inst_"+k)}</h4><ol>${st.map(x=>`<li>${x}</li>`).join("")}</ol>${T("inst_"+k+"_note")!=="inst_"+k+"_note"?`<p class="note">${T("inst_"+k+"_note")}</p>`:""}</div>`}
 // ---------- share ----------
@@ -431,7 +431,11 @@ async function addEntry(cat,min,note,date,start,pay){
 }
 async function delEntry(date,id){setDay(date,{entries:day(date).entries.filter(e=>e.id!==id)});render();await saveDay(date)}
 function showMsg(t,err){const m=$("msg");m.textContent=t;m.className="msg"+(err?" err":"");clearTimeout(showMsg.t);showMsg.t=setTimeout(()=>{m.textContent=""},3500)}
-function selectDay(d){flushNote();S.sel=d;if(monthOf(d)!==S.month)S.month=monthOf(d);render()}
+function selectDay(d){
+  flushNote();const changed=d!==S.sel;S.sel=d;if(monthOf(d)!==S.month)S.month=monthOf(d);render();
+  // soft fade of the day's content when switching days
+  if(changed)["cats","log","tasks","incStats","dayLabel"].forEach(id=>{const el=$(id);if(!el)return;el.classList.remove("swap");void el.offsetWidth;el.classList.add("swap")});
+}
 
 let noteDirty=null,noteTimer=null;
 function flushNote(){if(!noteDirty)return;clearTimeout(noteTimer);const d=noteDirty.date;noteDirty=null;saveDay(d).then(()=>{$("noteSaved").textContent=T("saved")})}
@@ -491,7 +495,6 @@ function render(){
       <div class="goal">${gl}</div></div>`}).join("");
 
   renderPlan();
-  renderTimeline();
 
   // logger
   $("seg").setAttribute("aria-label",T("logTime"));
@@ -548,6 +551,7 @@ function renderPlan(){
 }
 
 function renderTimeline(){
+  if(!$("tl"))return; // day timeline section was removed in 0.14.0
   const list=day(S.sel).entries;let html="",un=0,unMin=0;
   list.forEach(e=>{const s=toMin(e.start);const c=catInfo(e.cat);
     if(s==null){un++;unMin+=e.min;return}
@@ -587,7 +591,6 @@ function renderTimer(){
 }
 function tick(){const c=$("clock");if(!c||!S.timer)return;const s=Math.max(0,Math.floor((Date.now()-S.timer.start)/1000));c.textContent=Math.floor(s/3600)+":"+pad(Math.floor(s/60)%60)+":"+pad(s%60)}
 setInterval(tick,1000);
-setInterval(renderTimeline,60000);
 
 function renderWeek(){
   const ws=weekStart(S.sel);const days=[...Array(7)].map((_,i)=>addDays(ws,i));
@@ -816,6 +819,7 @@ function renderIncome(){
   $("incLegacy").hidden=!legacy.length;
   $("incList").innerHTML=legacy.map(x=>`<li><span class="amt">${fmtMoney(+x.amount,true)}</span><span class="tx">${esc(x.src)}</span><button class="del" data-idel="${x.id}" aria-label="×">×</button></li>`).join("");
   const gi=$("incGoal");if(document.activeElement!==gi)gi.value=g||"";
+  $("incGoalClr").hidden=!g;
   // day summary line
   const di=dayIncome(sel);$("dayIncome").textContent=di?"· "+T("dayIncome",{a:fmtMoney(di)}):"";
 }
@@ -877,7 +881,7 @@ function renderCatManager(){
       return `<div class="catrow${c.off?" off":""}" style="--c:var(${ci.v})">
         <button class="sw" data-cyc="${c.k}" aria-label="${T("colorBtn")}"></button>
         <input type="text" id="cn-${c.k}" data-cname="${c.k}" value="${esc(ci.name)}" maxlength="24" aria-label="${esc(ci.name)}">
-        <label class="gl"><input type="number" min="0" step="${weekly?0.5:0.25}" id="cg-${c.k}" data-goal="${c.k}" value="${+(v/60).toFixed(2)}" class="mono"><span>${T(weekly?"hPerWeek":"mPerDay")}</span></label>
+        <label class="gl"><input type="number" min="0" step="${weekly?0.5:0.25}" id="cg-${c.k}" data-goal="${c.k}" value="${+(v/60).toFixed(2)}" class="mono"><span>${T(weekly?"hPerWeek":"mPerDay")}</span>${v?`<button type="button" class="goalclr" data-gclr="${c.k}" aria-label="${T("removeGoal")}">×</button>`:""}</label>
         <label class="chk"><input type="checkbox" id="cp-${c.k}" data-cprod="${c.k}" ${c.prod?"checked":""}><span>${T("prodLabel")}</span></label>
         <label class="chk"><input type="checkbox" id="cpay-${c.k}" data-cpaid="${c.k}" ${ci.paid?"checked":""}><span>${T("paidLabel")}</span></label>
         <button class="small" data-coff="${c.k}">${c.off?T("show"):T("hide")}</button></div>`}).join("");
@@ -892,7 +896,7 @@ document.addEventListener("click",async ev=>{
   if(ds.lang){if(ds.lang!==LANG){LANG=ds.lang;try{localStorage.setItem("ps-lang",LANG)}catch(e){}render();saveSettings()}return}
   if(ds.cat){if(S.cat!==ds.cat){S.cat=ds.cat;$("payIn").value=S.payMode==="rate"&&S.payRates[ds.cat]?S.payRates[ds.cat]:""}render();return}
   if(ds.dur){setDur(+ds.dur);return}
-  if(ds.tm){if(S.tmode!==ds.tm){S.tmode=ds.tm;try{localStorage.setItem("ps-tmode",S.tmode)}catch(e){}renderTimeEntry();updatePayCalc()}return}
+  if(ds.tm){if(S.tmode!==ds.tm){S.tmode=ds.tm;try{localStorage.setItem("ps-tmode2",S.tmode)}catch(e){}renderTimeEntry();updatePayCalc()}return}
   if(ds.del){delEntry(S.sel,ds.del);return}
   if(ds.day){selectDay(ds.day);return}
   if(ds.pm){if(S.payMode!==ds.pm){S.payMode=ds.pm;$("payIn").value="";renderPay();renderTimer();saveSettings()}return}
@@ -904,6 +908,7 @@ document.addEventListener("click",async ev=>{
     const from=S.sel,to=addDays(from,1);const tk=day(from).tasks.find(x=>x.id===ds.mv);if(!tk)return;
     setDay(from,{tasks:day(from).tasks.filter(x=>x.id!==ds.mv)});setDay(to,{tasks:[...day(to).tasks,{...tk}]});
     render();await saveDay(from);await saveDay(to);return}
+  if(ds.gclr){const k=ds.gclr;if(S.goalMode==="week")S.wgoals={...S.wgoals,[k]:0};else S.goals={...S.goals,[k]:0};render();saveSettings();showMsg(T("goalRemoved"));return}
   if(ds.cyc){S.cats=S.cats.map(c=>c.k===ds.cyc?{...c,color:COLORS[(COLORS.indexOf(c.color)+1)%COLORS.length]}:c);render();saveSettings();return}
   if(ds.coff){S.cats=S.cats.map(c=>c.k===ds.coff?{...c,off:!c.off}:c);render();saveSettings();return}
   if(ds.ncol){S.newColor=ds.ncol;renderCatManager();return}
@@ -925,6 +930,7 @@ document.addEventListener("click",async ev=>{
       const nextCol=COLORS.find(col=>!S.cats.some(c=>c.color===col));if(nextCol)S.newColor=nextCol;
       render();saveSettings();showCatMsg(T("catAdded",{c:name}));break;}
     case "taskAdd":addTask();break;
+    case "incGoalClr":S.incomeGoal=0;$("incGoal").value="";renderIncome();saveSettings();break;
     case "iPrev":S.month=addMonths(S.month,-1);renderCalendar();renderIncome();break;
     case "iNext":S.month=addMonths(S.month,1);renderCalendar();renderIncome();break;
     case "exportBtn":exportBackup();break;
@@ -1014,7 +1020,6 @@ document.addEventListener("keydown",e=>{
   if(e.key==="ArrowRight")selectDay(addDays(S.sel,1));
 });
 window.addEventListener("pagehide",flushNote);
-$("importIn").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)importBackup(f);e.target.value=""});
 let smT;
 $("streakMin").addEventListener("input",e=>{const n=Math.round((+e.target.value||0)*60);if(!(n>0))return;S.streakMin=n;renderStreak();clearTimeout(smT);smT=setTimeout(saveSettings,700)});
 

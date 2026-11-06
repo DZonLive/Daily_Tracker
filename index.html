@@ -87,13 +87,6 @@
     </div>
   </section>
 
-  <section class="panel" aria-labelledby="tlH">
-    <div class="panel-head"><h2 id="tlH" data-t="timeline"></h2><span class="hint" data-t="scale"></span></div>
-    <div class="tl" id="tl"></div>
-    <div class="tlaxis" id="tlaxis"></div>
-    <div class="tlnote" id="tlnote"></div>
-  </section>
-
   <section class="panel" aria-labelledby="addH">
     <div class="panel-head"><h2 id="addH" data-t="logTime"></h2><span class="hint" id="addFor"></span></div>
     <div class="logger">
@@ -101,23 +94,23 @@
         <div class="seg" id="seg" role="group"></div>
         <div class="field">
           <div class="mode tmode" role="group">
-            <button type="button" data-tm="dur" id="tm-dur" data-t="tmDur"></button>
             <button type="button" data-tm="range" id="tm-range" data-t="tmRange"></button>
+            <button type="button" data-tm="dur" id="tm-dur" data-t="tmDur"></button>
           </div>
-          <div id="durBox" class="tbox">
-            <div class="tiles">
-              <button type="button" class="tile big" id="durTile"><span class="tlab" data-t="durL"></span><span class="tv" id="durVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-              <button type="button" class="tile" id="startTile"><span class="tlab" data-t="startedAt"></span><span class="tv" id="startVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-            </div>
-            <div class="durs" id="durs"></div>
-          </div>
-          <div id="rangeBox" class="tbox" hidden>
+          <div id="rangeBox" class="tbox">
             <div class="tiles range">
               <button type="button" class="tile big" id="rStartTile"><span class="tlab" data-t="rStartL"></span><span class="tv" id="rStartVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
               <span class="arrow" aria-hidden="true">→</span>
               <button type="button" class="tile big" id="rEndTile"><span class="tlab" data-t="rEndL"></span><span class="tv" id="rEndVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             </div>
             <div class="rangesum" id="rangeSum"></div>
+          </div>
+          <div id="durBox" class="tbox" hidden>
+            <div class="tiles">
+              <button type="button" class="tile big" id="durTile"><span class="tlab" data-t="durL"></span><span class="tv" id="durVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button type="button" class="tile" id="startTile"><span class="tlab" data-t="startedAt"></span><span class="tv" id="startVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+            <div class="durs" id="durs"></div>
           </div>
           <input type="hidden" id="startIn"><input type="hidden" id="rStart"><input type="hidden" id="rEnd">
           <div class="payrow" id="payRow" hidden>
@@ -199,23 +192,15 @@
     <div class="streakset">
       <label for="incGoal" data-t="incGoal"></label>
       <label class="money small-money"><span>$</span><input type="number" id="incGoal" min="0" step="50" class="mono"></label>
+      <button type="button" class="goalclr" id="incGoalClr" data-ta="removeGoal" hidden>×</button>
       <span class="hint" data-t="goalHint"></span>
     </div>
   </section>
 
-  <section class="panel" aria-labelledby="dataH">
-    <div class="panel-head"><h2 id="dataH" data-t="dataTitle"></h2><span class="hint" id="syncNote"></span></div>
-    <div class="datarow">
-      <button class="chipbtn" id="exportBtn" data-t="exportBtn"></button>
-      <label class="chipbtn filebtn"><span data-t="importBtn"></span><input type="file" id="importIn" accept="application/json,.json"></label>
-    </div>
-    <div class="migrate" id="migrateBox" hidden>
-      <p id="migrateText"></p>
-      <button class="primary" id="migrateBtn" data-t="migrateBtn"></button>
-    </div>
+  <section class="panel migrate" id="migrateBox" hidden>
+    <p id="migrateText"></p>
+    <button class="primary" id="migrateBtn" data-t="migrateBtn"></button>
     <div class="datamsg" id="dataMsg"></div>
-    <p class="hint" data-t="dataHint" style="margin:6px 0 0"></p>
-    <p class="hint ios" id="iosHint" hidden data-t="iosHint"></p>
   </section>
 
   <section class="panel" id="catsPanel" aria-labelledby="cgH">
