@@ -100,8 +100,36 @@
       <div>
         <div class="seg" id="seg" role="group"></div>
         <div class="field">
-          <span class="label" data-t="howLong"></span>
-          <div class="durs" id="durs"></div>
+          <div class="mode tmode" role="group">
+            <button type="button" data-tm="dur" id="tm-dur" data-t="tmDur"></button>
+            <button type="button" data-tm="range" id="tm-range" data-t="tmRange"></button>
+          </div>
+          <div id="durBox" class="tbox">
+            <div class="steppers">
+              <div class="stepper">
+                <button type="button" class="stepbtn" data-step="h:-1" aria-label="−1 h">−</button>
+                <input type="number" id="dH" min="0" max="23" inputmode="numeric" class="mono" aria-label="hours">
+                <span class="unit" data-t="hoursU"></span>
+                <button type="button" class="stepbtn" data-step="h:1" aria-label="+1 h">+</button>
+              </div>
+              <div class="stepper">
+                <button type="button" class="stepbtn" data-step="m:-15" aria-label="−15 min">−</button>
+                <input type="number" id="dM" min="0" max="59" step="5" inputmode="numeric" class="mono" aria-label="minutes">
+                <span class="unit" data-t="minsU"></span>
+                <button type="button" class="stepbtn" data-step="m:15" aria-label="+15 min">+</button>
+              </div>
+            </div>
+            <div class="durs" id="durs"></div>
+            <label class="inp w-start"><span data-t="startedAt"></span><input type="time" id="startIn" class="mono"></label>
+          </div>
+          <div id="rangeBox" class="tbox" hidden>
+            <div class="rangerow">
+              <label class="inp"><span data-t="rStartL"></span><input type="time" id="rStart" class="mono"></label>
+              <span class="arrow" aria-hidden="true">→</span>
+              <label class="inp"><span data-t="rEndL"></span><input type="time" id="rEnd" class="mono"></label>
+              <button type="button" class="ghost nowbtn" id="rNow" data-t="nowBtn"></button>
+            </div>
+          </div>
           <div class="payrow" id="payRow" hidden>
             <span class="label" data-t="payLabel"></span>
             <div class="mode" role="group">
@@ -112,12 +140,10 @@
             <span class="paycalc mono" id="payCalc"></span>
           </div>
           <div class="row">
-            <label class="inp w-dur"><span data-t="custom"></span><input type="text" id="durIn" class="mono" placeholder="1:20" inputmode="decimal"></label>
-            <label class="inp w-time"><span data-t="start"></span><input type="time" id="startIn" class="mono"></label>
             <label class="inp grow"><span data-t="note"></span><input type="text" id="noteIn" data-tp="notePh"></label>
-            <button class="primary" id="addBtn" data-t="add"></button>
           </div>
-          <div class="hint" data-t="startHint"></div>
+          <div class="preview" id="preview" aria-live="polite"></div>
+          <button class="primary addbig" id="addBtn" data-t="add"></button>
           <div class="msg" id="msg"></div>
         </div>
       </div>
@@ -213,7 +239,7 @@
     <div class="catlist" id="catlist"></div>
     <div class="streakset">
       <label for="streakMin" data-t="streakRule"></label>
-      <input type="number" id="streakMin" min="1" step="15" class="mono">
+      <input type="number" id="streakMin" min="0.25" step="0.25" class="mono">
       <span class="hint" data-t="streakRule2"></span>
     </div>
     <div class="newcat">

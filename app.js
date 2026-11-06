@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.11.0";
+const APP_VERSION="0.12.0";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -15,15 +15,15 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  timer:"Timer",running:"Timer running",since:"since {s}",stopLog:"Stop & log",reset:"Reset",timerIdle:"Track time live: start and end are logged automatically. Category:",go:"Start",
  journal:"Day log",emptyLog:"No entries. Pick a category and duration above, or start the timer.",noTime:"no time",
  week:"Week",total:"Total",productive:"Productive",activeDays:"Active days",ofSeven:"{n} of 7",avgActive:"Avg per active day",
- catsGoals:"Categories & goals",perWeek:"Per week",perDay:"Per day",hintWeek:"Hours per week. Best for an irregular schedule: what counts is the weekly total, not which day.",hintDay:"Minutes per day, tracked separately for each day. Set 0 for no goal.",
- hPerWeek:"h / week",mPerDay:"min / day",prodLabel:"productive",hide:"Hide",show:"Show",hidden:"hidden",newCat:"New category",namePh:"Name, e.g. Trading, Reading, Side project",catExists:"That category already exists",catNeedName:"Type a name for the category",catAdded:"Category added: {c}",colorBtn:"Change color",
+ catsGoals:"Categories & goals",perWeek:"Per week",perDay:"Per day",hintWeek:"Hours per week. Best for an irregular schedule: what counts is the weekly total, not which day.",hintDay:"Hours per day, tracked separately for each day. Set 0 for no goal.",
+ hPerWeek:"h / week",mPerDay:"h / day",prodLabel:"productive",hide:"Hide",show:"Show",hidden:"hidden",newCat:"New category",namePh:"Name, e.g. Trading, Reading, Side project",catExists:"That category already exists",catNeedName:"Type a name for the category",catAdded:"Category added: {c}",colorBtn:"Change color",
  deleted:"Deleted category",hasPlan:"tasks or notes",addCat:"+ Category",
  status_connecting:"Loading…",status_local:"Saved on this device",status_synced:"Synced",status_slow:"Storage isn't responding yet — data may be incomplete",status_err:"Storage error: {e}",
  h:"h",m:"m",dow:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
  entries:n=>n===1?"entry":"entries",
  cat_study:"Study",cat_work:"Work",cat_train:"Workout",cat_rest:"Rest",
  streakNow:"day streak",streakNow1:"day streak",streakBest:"Best: {n}",streakToday:"Today counts after {t} productive",streakTodayDone:"Today counts ✓",
- streakRule:"Streak: a day counts if productive time is at least",streakRule2:"minutes",
+ streakRule:"Streak: a day counts if productive time is at least",streakRule2:"hours",
  weekDetail:"Week in detail",prevWeek:"Previous week",nextWeek:"Next week",rangeAuto:"Auto",showTable:"Show as table",
  wdNoTime:"{n} without a start time this week ({t}) are only in the table.",wdEmpty:"Nothing logged this week yet.",
  status_offline:"Offline — changes are saved on this device",status_offline_pending:"Offline — changes will sync when you're back online",status_saving:"Syncing…",
@@ -45,6 +45,9 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  payLabel:"Earned",pmSum:"Total",pmRate:"Per hour",sumPh:"e.g. 60",ratePh:"$ per hour",payOptional:"optional — leave empty if unpaid",pickDur:"pick how long you worked",perHourIs:"≈ {r} per hour",
  thPay:"Earned",paidLabel:"income",perHourHint2:"month income ÷ hours in paid categories",legacyTitle:"Income added separately (older version)",
  incHow:"Income is added when you log time in {c}: pick the category, the duration and fill in “Earned”.",
+ tmDur:"How long",tmRange:"From – to",hoursU:"h",minsU:"min",startedAt:"Started at (optional)",rStartL:"Start",rEndL:"End",nowBtn:"Now",
+ pvDur:"Set how long: use − / + or a quick button",pvRange:"Set when you started and finished",pvNeedStart:"Set the start time",pvNeedEnd:"Set the end time",sameTimes:"Start and end are the same",
+ pvJustNow:"ends now — set “Started at” if it was earlier",pvOvernight:"goes past midnight",pvNoTime:"no start time — counts in totals, not shown on the day timeline",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -69,15 +72,15 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  timer:"Таймер",running:"Таймер идёт",since:"с {s}",stopLog:"Стоп и записать",reset:"Сбросить",timerIdle:"Засекай время прямо во время занятия: начало и конец запишутся сами. Категория:",go:"Старт",
  journal:"Журнал дня",emptyLog:"Записей нет. Выбери категорию и длительность выше или запусти таймер.",noTime:"без времени",
  week:"Неделя",total:"Всего",productive:"Продуктивно",activeDays:"Активных дней",ofSeven:"{n} из 7",avgActive:"В среднем за активный день",
- catsGoals:"Категории и цели",perWeek:"На неделю",perDay:"На день",hintWeek:"Часы в неделю. Подходит для плавающего графика: важно, сколько набрал за неделю, а не в какой день.",hintDay:"Минуты в день, считаются отдельно для каждого дня. Поставь 0, если цель не нужна.",
- hPerWeek:"ч / нед",mPerDay:"мин / день",prodLabel:"продуктивное",hide:"Скрыть",show:"Вернуть",hidden:"скрыта",newCat:"Новая категория",namePh:"Название, например Трейдинг, Чтение, Проект",catExists:"Такая категория уже есть",catNeedName:"Впиши название категории",catAdded:"Категория добавлена: {c}",colorBtn:"Сменить цвет",
+ catsGoals:"Категории и цели",perWeek:"На неделю",perDay:"На день",hintWeek:"Часы в неделю. Подходит для плавающего графика: важно, сколько набрал за неделю, а не в какой день.",hintDay:"Часы в день, считаются отдельно для каждого дня. Поставь 0, если цель не нужна.",
+ hPerWeek:"ч / нед",mPerDay:"ч / день",prodLabel:"продуктивное",hide:"Скрыть",show:"Вернуть",hidden:"скрыта",newCat:"Новая категория",namePh:"Название, например Трейдинг, Чтение, Проект",catExists:"Такая категория уже есть",catNeedName:"Впиши название категории",catAdded:"Категория добавлена: {c}",colorBtn:"Сменить цвет",
  deleted:"Удалённая категория",hasPlan:"задачи или заметки",addCat:"+ Категория",
  status_connecting:"Загрузка…",status_local:"Сохранено на этом устройстве",status_synced:"Синхронизировано",status_slow:"Хранилище пока не отвечает — данные могут быть неполными",status_err:"Ошибка хранилища: {e}",
  h:"ч",m:"м",dow:["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],
  entries:n=>{const a=n%10,b=n%100;return (a===1&&b!==11)?"запись":(a>=2&&a<=4&&(b<10||b>=20))?"записи":"записей"},
  cat_study:"Учёба",cat_work:"Работа",cat_train:"Тренировка",cat_rest:"Отдых",
  streakNow:"дней подряд",streakNow1:"день подряд",streakBest:"Рекорд: {n}",streakToday:"Сегодня засчитается после {t} продуктивного",streakTodayDone:"Сегодня засчитано ✓",
- streakRule:"Streak: день засчитывается, если продуктивного времени не меньше",streakRule2:"минут",
+ streakRule:"Streak: день засчитывается, если продуктивного времени не меньше",streakRule2:"ч",
  weekDetail:"Неделя подробно",prevWeek:"Предыдущая неделя",nextWeek:"Следующая неделя",rangeAuto:"Авто",showTable:"Показать таблицей",
  wdNoTime:"{n} без времени начала на этой неделе ({t}) есть только в таблице.",wdEmpty:"На этой неделе пока ничего не записано.",
  status_offline:"Офлайн — изменения сохранены на устройстве",status_offline_pending:"Офлайн — изменения отправятся, когда появится интернет",status_saving:"Синхронизация…",
@@ -99,6 +102,9 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  payLabel:"Заработок",pmSum:"Сумма",pmRate:"В час",sumPh:"напр. 60",ratePh:"$ в час",payOptional:"необязательно — оставь пустым, если не платили",pickDur:"выбери, сколько работал",perHourIs:"≈ {r} в час",
  thPay:"Заработок",paidLabel:"доход",perHourHint2:"доход за месяц ÷ часы в оплачиваемых категориях",legacyTitle:"Доход, добавленный отдельно (старая версия)",
  incHow:"Доход добавляется при записи времени в {c}: выбери категорию, длительность и заполни «Заработок».",
+ tmDur:"Сколько времени",tmRange:"С … до …",hoursU:"ч",minsU:"мин",startedAt:"Начал в (необязательно)",rStartL:"Начало",rEndL:"Конец",nowBtn:"Сейчас",
+ pvDur:"Укажи, сколько: кнопки − / + или быстрый выбор",pvRange:"Укажи, во сколько начал и закончил",pvNeedStart:"Укажи время начала",pvNeedEnd:"Укажи время конца",sameTimes:"Начало и конец совпадают",
+ pvJustNow:"закончил только что — укажи «Начал в», если было раньше",pvOvernight:"через полночь",pvNoTime:"без времени начала — попадёт в итоги, но не на шкалу дня",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -128,16 +134,17 @@ const DEFAULT_CATS=[
 ];
 const DEF_DAY={study:120,work:240,train:60,rest:90};
 const DEF_WEEK={study:600,work:1200,train:240,rest:600};
-const DURS=[15,30,45,60,90,120];
+const DURS=[15,30,45,60,90,120,180,240,360,480];
 const $=id=>document.getElementById(id);
 
 const S={
   days:{},          // date -> {entries:[], tasks:[], note:""}
   cats:DEFAULT_CATS.map(c=>({...c})),
   goals:{...DEF_DAY}, wgoals:{...DEF_WEEK}, goalMode:"week",
-  timer:null, sel:todayStr(), month:null, cat:"study", dur:null, newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
+  timer:null, sel:todayStr(), month:null, cat:"study", dh:0, dm:0, tmode:"dur", newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
 };
 S.month=monthOf(S.sel);
+try{const tm=localStorage.getItem("ps-tmode");if(tm==="dur"||tm==="range")S.tmode=tm}catch(e){}
 
 function catInfo(k){
   const c=S.cats.find(x=>x.k===k);
@@ -488,7 +495,7 @@ function render(){
   $("seg").setAttribute("aria-label",T("logTime"));
   $("seg").innerHTML=activeCats().map(c=>`<button type="button" style="--c:var(${c.v})" data-cat="${c.k}" aria-pressed="${S.cat===c.k}"><span class="dot"></span>${esc(c.name)}</button>`).join("")
     +`<button type="button" class="addcat" id="goNewCat">${T("addCat")}</button>`;
-  $("durs").innerHTML=DURS.map(d=>{const H=T("h"),M=T("m");return `<button type="button" data-dur="${d}" aria-pressed="${S.dur===d}">${d<60?d+M:(d%60?(d/60).toString().replace(".",LANG==="ru"?",":".")+H:d/60+H)}</button>`}).join("");
+  renderTimeEntry();
   renderTimer();
   renderPay();
 
@@ -620,6 +627,54 @@ function renderStreak(){
     <div class="sdots" aria-hidden="true">${dots}</div>`;
 }
 
+// ---------- time entry ----------
+// Two ways to say how long: "Duration" (hours/minutes steppers + quick buttons, optional start time)
+// or "From – to" (start and end time; the length is calculated). A preview shows exactly what will be saved.
+const durMin=()=>S.dh*60+S.dm;
+function chipLabel(d){const H=T("h"),M=T("m");return d<60?d+" "+M:(d%60?(d/60).toString().replace(".",LANG==="ru"?",":".")+" "+H:d/60+" "+H)}
+function renderTimeEntry(){
+  const isDur=S.tmode==="dur";
+  $("tm-dur").setAttribute("aria-pressed",isDur);$("tm-range").setAttribute("aria-pressed",!isDur);
+  $("durBox").hidden=!isDur;$("rangeBox").hidden=isDur;
+  const cur=durMin();
+  $("durs").innerHTML=DURS.map(d=>`<button type="button" data-dur="${d}" aria-pressed="${cur===d}">${chipLabel(d)}</button>`).join("");
+  if(document.activeElement!==$("dH"))$("dH").value=S.dh;
+  if(document.activeElement!==$("dM"))$("dM").value=pad(S.dm);
+  $("rNow").hidden=S.sel!==todayStr();
+  updatePreview();
+}
+function setDur(min){min=Math.max(0,Math.min(23*60+59,Math.round(min)));S.dh=Math.floor(min/60);S.dm=min%60;renderTimeEntry();updatePayCalc()}
+// What the form will save right now: {min,start,auto} or {err,hint}
+function readTime(){
+  if(S.tmode==="range"){
+    const a=toMin($("rStart").value),b=toMin($("rEnd").value);
+    if(a==null||b==null)return {hint:T(a==null&&b==null?"pvRange":a==null?"pvNeedStart":"pvNeedEnd")};
+    const min=(b-a+1440)%1440;
+    if(!min)return {hint:T("sameTimes"),err:true};
+    return {min,start:fromMin(a),overnight:b<a};
+  }
+  const min=durMin();
+  if(!min)return {hint:T("pvDur")};
+  let start=$("startIn").value||null,auto=false;
+  if(!start&&S.sel===todayStr()){const n=new Date();const st=n.getHours()*60+n.getMinutes()-min;if(st>=0){start=fromMin(st);auto=true}}
+  return {min,start,auto};
+}
+function updatePreview(){
+  const el=$("preview");if(!el)return;
+  if(!S.cat){el.className="preview";el.textContent="";return}
+  const c=catInfo(S.cat),r=readTime();
+  if(!r.min){el.className="preview";el.style.removeProperty("--c");el.innerHTML=(r.err?"⚠ ":"")+esc(r.hint);return}
+  let pay=0;if(c.paid){const p=payFromInput(r.min,S.cat);if(isFinite(p))pay=p}
+  const when=r.start?`<span class="pvt">${r.start}–${fromMin(toMin(r.start)+r.min)}</span>`:"";
+  const notes=[];
+  if(r.auto)notes.push(T("pvJustNow"));
+  if(r.overnight)notes.push(T("pvOvernight"));
+  if(!r.start)notes.push(T("pvNoTime"));
+  const dayTxt=S.sel===todayStr()?T("today").toLowerCase():fD().format(parse(S.sel));
+  el.className="preview ok";el.style.setProperty("--c",`var(${c.v})`);
+  el.innerHTML=`<span class="dot"></span><b>${esc(c.name)}</b>${when?" · "+when:""} · <span class="pvt">${fmt(r.min)}</span>${pay?` · <span class="pay">${fmtMoney(pay,true)}</span>`:""} · ${esc(dayTxt)}${notes.length?`<span class="pvs">${notes.join(" · ")}</span>`:""}`;
+}
+
 // ---------- income ----------
 const fmtMoney=(x,cents)=>{x=Math.round((x||0)*100)/100;const f=cents||Math.round(x)!==x?2:0;return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:f,maximumFractionDigits:f}).format(x)};
 const dayIncome=date=>{const d=day(date);return d.entries.reduce((a,e)=>a+(+e.pay||0),0)+(d.income||[]).reduce((a,x)=>a+(+x.amount||0),0)};
@@ -629,7 +684,7 @@ function payFromInput(min,cat){
   const v=parseAmount(raw);if(!isFinite(v))return NaN;
   return S.payMode==="rate"?Math.round(v*min/60*100)/100:v;
 }
-function currentDur(){const raw=$("durIn").value;const m=raw.trim()?parseDur(raw):S.dur;return isFinite(m)&&m>0?m:null}
+function currentDur(){const r=readTime();return r.min||null}
 function renderPay(){
   const row=$("payRow");const c=S.cat?catInfo(S.cat):null;
   row.hidden=!(c&&c.paid);if(row.hidden)return;
@@ -639,6 +694,7 @@ function renderPay(){
   updatePayCalc();
 }
 function updatePayCalc(){
+  updatePreview();
   const el=$("payCalc");const min=currentDur();const raw=$("payIn").value.trim();
   if(!raw){el.textContent=T("payOptional");return}
   const v=parseAmount(raw);if(!isFinite(v)){el.textContent="";return}
@@ -735,7 +791,7 @@ function renderWeekDetail(){
 }
 
 function renderCatManager(){
-  const smi=$("streakMin");if(document.activeElement!==smi)smi.value=S.streakMin;
+  const smi=$("streakMin");if(document.activeElement!==smi)smi.value=+(S.streakMin/60).toFixed(2);
   const weekly=S.goalMode==="week";
   $("mode-week").setAttribute("aria-pressed",weekly);$("mode-day").setAttribute("aria-pressed",!weekly);
   $("goalHint").textContent=T(weekly?"hintWeek":"hintDay");
@@ -745,7 +801,7 @@ function renderCatManager(){
       return `<div class="catrow${c.off?" off":""}" style="--c:var(${ci.v})">
         <button class="sw" data-cyc="${c.k}" aria-label="${T("colorBtn")}"></button>
         <input type="text" id="cn-${c.k}" data-cname="${c.k}" value="${esc(ci.name)}" maxlength="24" aria-label="${esc(ci.name)}">
-        <label class="gl"><input type="number" min="0" step="${weekly?0.5:15}" id="cg-${c.k}" data-goal="${c.k}" value="${weekly?+(v/60).toFixed(1):v}" class="mono"><span>${T(weekly?"hPerWeek":"mPerDay")}</span></label>
+        <label class="gl"><input type="number" min="0" step="${weekly?0.5:0.25}" id="cg-${c.k}" data-goal="${c.k}" value="${+(v/60).toFixed(2)}" class="mono"><span>${T(weekly?"hPerWeek":"mPerDay")}</span></label>
         <label class="chk"><input type="checkbox" id="cp-${c.k}" data-cprod="${c.k}" ${c.prod?"checked":""}><span>${T("prodLabel")}</span></label>
         <label class="chk"><input type="checkbox" id="cpay-${c.k}" data-cpaid="${c.k}" ${ci.paid?"checked":""}><span>${T("paidLabel")}</span></label>
         <button class="small" data-coff="${c.k}">${c.off?T("show"):T("hide")}</button></div>`}).join("");
@@ -759,7 +815,9 @@ document.addEventListener("click",async ev=>{
   const ds=b.dataset;
   if(ds.lang){if(ds.lang!==LANG){LANG=ds.lang;try{localStorage.setItem("ps-lang",LANG)}catch(e){}render();saveSettings()}return}
   if(ds.cat){if(S.cat!==ds.cat){S.cat=ds.cat;$("payIn").value=S.payMode==="rate"&&S.payRates[ds.cat]?S.payRates[ds.cat]:""}render();return}
-  if(ds.dur){const d=+ds.dur;S.dur=S.dur===d?null:d;$("durIn").value="";render();return}
+  if(ds.dur){setDur(+ds.dur);return}
+  if(ds.step){const [u,n]=ds.step.split(":");setDur(durMin()+(u==="h"?+n*60:+n));return}
+  if(ds.tm){if(S.tmode!==ds.tm){S.tmode=ds.tm;try{localStorage.setItem("ps-tmode",S.tmode)}catch(e){}renderTimeEntry();updatePayCalc()}return}
   if(ds.del){delEntry(S.sel,ds.del);return}
   if(ds.day){selectDay(ds.day);return}
   if(ds.pm){if(S.payMode!==ds.pm){S.payMode=ds.pm;$("payIn").value="";renderPay();renderTimer();saveSettings()}return}
@@ -810,11 +868,9 @@ document.addEventListener("click",async ev=>{
     case "shareCopy":{try{await navigator.clipboard.writeText(APP_URL);$("shareCopied").textContent=T("linkCopied")}catch(e){$("shareUrl").select();$("shareCopied").textContent=T("copyManual")}break}
     case "addBtn":{
       if(!S.cat)return;
-      const raw=$("durIn").value;let min=raw.trim()?parseDur(raw):S.dur;
-      if(min==null){showMsg(T("needDur"),true);return}
-      if(!isFinite(min)||min<=0||min>1440){showMsg(T("badDur"),true);return}
-      let start=$("startIn").value||null;
-      if(!start&&S.sel===todayStr()){const n=new Date();const s=n.getHours()*60+n.getMinutes()-min;if(s>=0)start=fromMin(s)}
+      const tr=readTime();
+      if(!tr.min){showMsg(tr.hint,true);return}
+      const min=tr.min,start=tr.start;
       const ci=catInfo(S.cat),cn=ci.name;
       let pay=0;
       if(ci.paid){
@@ -824,9 +880,10 @@ document.addEventListener("click",async ev=>{
       }
       await addEntry(S.cat,min,$("noteIn").value.trim(),S.sel,start,pay);
       showMsg(T("added",{t:fmt(min),c:cn})+(start?T("addedAt",{s:start}):"")+(pay?" · "+fmtMoney(pay,true):""));
-      $("durIn").value="";$("noteIn").value="";$("startIn").value="";S.dur=null;
+      $("noteIn").value="";$("startIn").value="";$("rStart").value="";$("rEnd").value="";S.dh=0;S.dm=0;
       if(S.payMode!=="rate")$("payIn").value="";
       render();break;}
+    case "rNow":{const n=new Date();$("rEnd").value=pad(n.getHours())+":"+pad(n.getMinutes());updatePayCalc();break}
     case "tStart":if(!S.cat)return;S.timer={cat:S.cat,start:Date.now()};render();saveSettings();break;
     case "tStop":{
       const tm=S.timer;if(!tm)return;const min=Math.round((Date.now()-tm.start)/60000);
@@ -866,12 +923,20 @@ $("noteArea").addEventListener("input",e=>{
 $("noteArea").addEventListener("blur",()=>{flushNote();renderCalendar()});
 $("payIn").addEventListener("input",updatePayCalc);
 $("payIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()});
-$("durIn").addEventListener("input",()=>{updatePayCalc();if(S.dur!==null){S.dur=null;document.querySelectorAll("#durs button").forEach(x=>x.setAttribute("aria-pressed","false"))}});
-["durIn","noteIn","startIn"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()}));
+function readSteppers(){
+  let h=Math.floor(+$("dH").value||0),m=Math.floor(+$("dM").value||0);
+  h=Math.max(0,Math.min(23,h));m=Math.max(0,Math.min(59,m));
+  S.dh=h;S.dm=m;
+  document.querySelectorAll("#durs button").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.dur===durMin()));
+  updatePayCalc();
+}
+["dH","dM"].forEach(id=>{$(id).addEventListener("input",readSteppers);$(id).addEventListener("blur",()=>{renderTimeEntry()});$(id).addEventListener("focus",e=>e.target.select())});
+["startIn","rStart","rEnd"].forEach(id=>$(id).addEventListener("input",updatePayCalc));
+["dH","dM","noteIn","startIn","rStart","rEnd"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()}));
 let goalT;
 $("catlist").addEventListener("input",e=>{
   const k=e.target.dataset.goal;if(!k)return;const n=Math.max(0,+e.target.value||0);
-  if(S.goalMode==="week")S.wgoals={...S.wgoals,[k]:Math.round(n*60)};else S.goals={...S.goals,[k]:Math.round(n)};
+  if(S.goalMode==="week")S.wgoals={...S.wgoals,[k]:Math.round(n*60)};else S.goals={...S.goals,[k]:Math.round(n*60)};
   render();clearTimeout(goalT);goalT=setTimeout(saveSettings,700);
 });
 document.addEventListener("keydown",e=>{
@@ -882,7 +947,7 @@ document.addEventListener("keydown",e=>{
 window.addEventListener("pagehide",flushNote);
 $("importIn").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)importBackup(f);e.target.value=""});
 let smT;
-$("streakMin").addEventListener("input",e=>{const n=Math.round(+e.target.value);if(!(n>0))return;S.streakMin=n;renderStreak();clearTimeout(smT);smT=setTimeout(saveSettings,700)});
+$("streakMin").addEventListener("input",e=>{const n=Math.round((+e.target.value||0)*60);if(!(n>0))return;S.streakMin=n;renderStreak();clearTimeout(smT);smT=setTimeout(saveSettings,700)});
 
 boot();
 })();

@@ -377,3 +377,33 @@ dialog#acct::backdrop,dialog.sheet::backdrop{background:rgba(10,12,18,.55)}
 .timer .payrow{margin-top:0}
 .inc-how{margin:0 0 4px}
 table.wt td.pay{white-space:nowrap}
+
+/* Time entry */
+.tmode{align-self:start;justify-self:start}
+.tbox{display:grid;gap:10px}
+.steppers{display:flex;flex-wrap:wrap;gap:10px}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);overflow:hidden}
+.stepbtn{width:44px;height:48px;border:0;background:transparent;font-size:22px;font-weight:500;color:var(--ink)}
+.stepbtn:hover{background:var(--soft)}
+.stepper input{width:52px;height:48px;border:0!important;background:transparent!important;text-align:right;font-size:24px;font-weight:600;padding:0 2px!important;-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.stepper input:focus{outline:none}
+.stepper:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.stepper .unit{font-size:14px;color:var(--muted);padding:0 6px 0 4px;min-width:30px}
+.w-start{max-width:220px}
+.rangerow{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px}
+.rangerow .inp{flex:0 1 140px}
+.rangerow input[type=time]{height:48px;font-size:18px}
+.rangerow .arrow{font-size:20px;color:var(--muted);padding-bottom:10px}
+.nowbtn{height:48px}
+.preview{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-height:44px;padding:10px 12px;border-radius:10px;border:1px dashed var(--line);font-size:14px;color:var(--muted)}
+.preview.ok{border-style:solid;border-color:var(--c);background:color-mix(in srgb,var(--c) 7%,var(--panel));color:var(--ink)}
+.preview b{font-weight:600}
+.preview .pvt{font-family:var(--f-mono);font-weight:600}
+.preview .pvs{color:var(--muted);font-size:12px;flex-basis:100%}
+.preview .pay{margin-left:2px}
+.addbig{width:100%;height:46px;font-size:15px}
+@media (max-width:460px){.stepbtn{width:40px}.stepper input{width:44px}}
+.steppers .stepper{flex:1 1 160px;max-width:220px;justify-content:space-between}
+.stepper .unit{margin-right:auto}
+.stepper input{flex:0 0 auto}

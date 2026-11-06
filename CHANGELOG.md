@@ -3,6 +3,11 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.12.0 (beta) — 2026-11-06
+- New time entry: choose "How long" (− / + for hours and minutes, quick buttons up to 8 h, optional start time) or "From – to" (start and end; the length is calculated, overnight shifts supported, "Now" button for the end)
+- Live preview shows exactly what will be saved: category, time range, length, earnings, day
+- Goals per day and the streak threshold are now set in hours instead of minutes
+
 ## 0.11.0 (beta) — 2026-11-05
 - Income is now entered together with work time: pick Work, the duration, and fill in "Earned" (a total or a per-hour rate, which is remembered). The separate income form is gone.
 - Earnings show in the day log, the week table (new "Earned" column and day totals) and the week grid tooltips.
