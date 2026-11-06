@@ -3,6 +3,9 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.12.1 (beta) — 2026-11-06
+- Fix: updates show up right after they are published (the app no longer reuses files the browser cached for up to 10 minutes)
+
 ## 0.12.0 (beta) — 2026-11-06
 - New time entry: choose "How long" (− / + for hours and minutes, quick buttons up to 8 h, optional start time) or "From – to" (start and end; the length is calculated, overnight shifts supported, "Now" button for the end)
 - Live preview shows exactly what will be saved: category, time range, length, earnings, day

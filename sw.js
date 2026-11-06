@@ -10,13 +10,17 @@
 // Caching:
 //  - App code (html, js, css, manifest): network first, cached copy when offline -> always fresh when online.
 //  - Icons, fonts and the Firebase SDK (versioned URLs): cache first.
-const VERSION = "0.12.0";
+const VERSION = "0.12.1";
 const CACHE = "productivity-starter-" + VERSION;
 const SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./cloud.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // cache: "reload" skips the browser's HTTP cache (GitHub Pages lets browsers keep files for 10 minutes),
+  // so a new version never gets stored with old files.
+  event.waitUntil(caches.open(CACHE)
+    .then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: "reload" }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener("message", (event) => {
@@ -44,7 +48,8 @@ self.addEventListener("fetch", (event) => {
 
   if (req.mode === "navigate" || isCode(url)) {
     event.respondWith(
-      fetch(req)
+      // "no-cache": always ask the server (cheap: it answers "not modified" when nothing changed)
+      fetch(req, { cache: "no-cache" })
         .then((res) => {
           if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req.mode === "navigate" ? "./index.html" : req, copy)); }
           return res;

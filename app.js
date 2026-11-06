@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.12.0";
+const APP_VERSION="0.12.1";
 (function(){
 // ---------- i18n ----------
 const I18N={
