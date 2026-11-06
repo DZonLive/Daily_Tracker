@@ -3,6 +3,12 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.15.2 (beta) — 2026-11-06
+- Timer: for paid categories the earnings question appears after Stop ("Save" / "No earnings" / "Back to timer"), not while it runs; time spent answering doesn't count
+- Fix: timer sessions under a minute are no longer saved (30–59 s used to round up to 1 min)
+- Week table: edit and delete buttons on every row
+- "income" checkbox renamed to "paid work"; short explanation of "productive" and "paid work" under Categories
+
 ## 0.15.1 (beta) — 2026-11-06
 - Categories can be deleted (red × at the right end of the row, then "Delete?"). Past entries stay in history.
 - Day log: ✎ edits an entry in the "Log time" form (pick another day while editing to move it); × is red and at the far right

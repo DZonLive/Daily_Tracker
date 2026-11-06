@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.15.1";
+const APP_VERSION="0.15.2";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -43,7 +43,7 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  addIncome:"Add income for {d}",amountPh:"Amount",srcPh:"Source (optional): job, client, gig…",noIncome:"No income on this day.",grossNote:"before taxes",
  incGoal:"Monthly income goal",goalHint:"empty or 0 = no goal",incGoalLeft:"{a} left to {b}",incGoalDone:"Goal reached ✓ {b}",badAmount:"Enter an amount, e.g. 85 or 120.50",incAdded:"Added {a}",dayIncome:"earned {a}",
  payLabel:"Earned",pmSum:"Total",pmRate:"Per hour",sumPh:"e.g. 60",ratePh:"$ per hour",payOptional:"optional — leave empty if unpaid",pickDur:"pick how long you worked",perHourIs:"≈ {r} per hour",
- thPay:"Earned",paidLabel:"income",perHourHint2:"month income ÷ hours in paid categories",legacyTitle:"Income added separately (older version)",
+ thPay:"Earned",paidLabel:"paid work",perHourHint2:"month income ÷ hours in paid categories",legacyTitle:"Income added separately (older version)",
  incHow:"Income is added when you log time in {c}: pick the category, the duration and fill in “Earned”.",
  tmDur:"How long",tmRange:"From – to",hoursU:"h",minsU:"min",startedAt:"Started at",rStartL:"Start",rEndL:"End",nowBtn:"Now",
  pvDur:"Choose how long: tap Duration or a quick button",pvRange:"Set when you started and finished",pvNeedStart:"Set the start time",pvNeedEnd:"Set the end time",sameTimes:"Start and end are the same",
@@ -55,6 +55,8 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  lookLabel:"Look",lookLuxe:"Luxe",lookClassic:"Classic",
  deleteCat:"Delete category",deleteQ:"Delete?",catDeleted:"Deleted “{c}”. Its past entries stay in your history.",lastCat:"You need at least one category.",
  editEntry:"Edit",deleteEntry:"Delete",saveChanges:"Save changes",editing:"Editing an entry",editMove:"Will move the entry to {d}",entrySaved:"Changes saved",
+ catHelp:"Productive: counts toward the streak and the “Productive” share. Paid work: when you log time in it, you can add what you earned.",
+ askPay:"How much did you earn for this?",askPayHint:"Leave empty or tap “No earnings” if this time wasn't paid.",savePay:"Save",noPay:"No earnings",backToTimer:"Back to timer",stopped:"Stopped",entryDeleted:"Entry deleted",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -107,7 +109,7 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  addIncome:"Добавить доход за {d}",amountPh:"Сумма",srcPh:"Откуда (необязательно): работа, клиент, подработка…",noIncome:"За этот день дохода нет.",grossNote:"до налогов",
  incGoal:"Цель по доходу на месяц",goalHint:"пусто или 0 — без цели",incGoalLeft:"до {b} осталось {a}",incGoalDone:"Цель достигнута ✓ {b}",badAmount:"Введи сумму, например 85 или 120.50",incAdded:"Добавлено {a}",dayIncome:"заработано {a}",
  payLabel:"Заработок",pmSum:"Сумма",pmRate:"В час",sumPh:"напр. 60",ratePh:"$ в час",payOptional:"необязательно — оставь пустым, если не платили",pickDur:"выбери, сколько работал",perHourIs:"≈ {r} в час",
- thPay:"Заработок",paidLabel:"доход",perHourHint2:"доход за месяц ÷ часы в оплачиваемых категориях",legacyTitle:"Доход, добавленный отдельно (старая версия)",
+ thPay:"Заработок",paidLabel:"оплачиваемая",perHourHint2:"доход за месяц ÷ часы в оплачиваемых категориях",legacyTitle:"Доход, добавленный отдельно (старая версия)",
  incHow:"Доход добавляется при записи времени в {c}: выбери категорию, длительность и заполни «Заработок».",
  tmDur:"Сколько времени",tmRange:"С … до …",hoursU:"ч",minsU:"мин",startedAt:"Начал в",rStartL:"Начало",rEndL:"Конец",nowBtn:"Сейчас",
  pvDur:"Выбери, сколько: нажми «Длительность» или быструю кнопку",pvRange:"Укажи, во сколько начал и закончил",pvNeedStart:"Укажи время начала",pvNeedEnd:"Укажи время конца",sameTimes:"Начало и конец совпадают",
@@ -119,6 +121,8 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  lookLabel:"Оформление",lookLuxe:"Люкс",lookClassic:"Классика",
  deleteCat:"Удалить категорию",deleteQ:"Удалить?",catDeleted:"Категория «{c}» удалена. Её прошлые записи останутся в истории.",lastCat:"Нужна хотя бы одна категория.",
  editEntry:"Изменить",deleteEntry:"Удалить",saveChanges:"Сохранить изменения",editing:"Редактирование записи",editMove:"Запись переместится на {d}",entrySaved:"Изменения сохранены",
+ catHelp:"Продуктивное — время идёт в streak и в долю «Продуктивно». Оплачиваемая — при записи времени можно указать, сколько заработал.",
+ askPay:"Сколько заработал за это время?",askPayHint:"Оставь пустым или нажми «Без заработка», если за это время не платили.",savePay:"Сохранить",noPay:"Без заработка",backToTimer:"Вернуться к таймеру",stopped:"Остановлен",entryDeleted:"Запись удалена",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -625,17 +629,23 @@ function renderTimeline(){
 
 let timerPayDraft="";
 function renderTimer(){
-  if(document.activeElement&&document.activeElement.id==="tPay"&&S.timer)return; // don't wipe what is being typed
+  if(document.activeElement&&document.activeElement.id==="tPay"&&S.timer&&S.timer.stopping)return; // don't wipe what is being typed
   const el=$("timer"),tm=S.timer;
   if(tm){
     const c=catInfo(tm.cat);
-    const paused=!!tm.pausedAt,st=new Date(tm.start),np=(tm.pauses||[]).length+(paused?1:0);
+    const paused=!!tm.pausedAt&&!tm.stopping,st=new Date(tm.start),np=(tm.pauses||[]).length+(paused||(tm.stopping&&tm.wasPaused)?1:0);
     el.className="timer on"+(paused?" paused":"");el.style.setProperty("--c",`var(${c.v})`);
-    el.innerHTML=`<span class="label">${T(paused?"onPause":"running")}</span><div class="clock" id="clock">0:00:00</div>
+    el.innerHTML=`<span class="label">${T(tm.stopping?"stopped":paused?"onPause":"running")}</span><div class="clock" id="clock">0:00:00</div>
       <div class="what">${paused?"":`<span class="pulse"></span>`}<b>${esc(c.name)}</b> · ${T("since",{s:clock(st.getHours()*60+st.getMinutes())})}${np?` · ${T("pausesN",{n:np,t:fmt(Math.round(pausedMs(tm,Date.now())/60000))})}`:""}</div>
-      ${c.paid?`<div class="payrow"><span class="label">${T("payLabel")}</span><label class="money"><span>$</span><input type="text" id="tPay" inputmode="decimal" class="mono" placeholder="${S.payMode==="rate"?T("ratePh"):T("sumPh")}"></label><span class="paycalc">${S.payMode==="rate"?T("pmRate"):T("pmSum")}</span></div>`:""}
-      <div class="row"><button class="ghost pausebtn" id="tPause">${paused?"▶ "+T("resume"):"❚❚ "+T("pause")}</button><button class="primary" id="tStop">${T("stopLog")}</button><button class="ghost" id="tCancel">${T("reset")}</button></div>`;
-    const tp=$("tPay");if(tp){tp.value=timerPayDraft||(S.payMode==="rate"&&S.payRates[tm.cat]?S.payRates[tm.cat]:"");tp.addEventListener("input",()=>{timerPayDraft=tp.value})}
+      ${tm.stopping?`<div class="stopask">
+          <div class="stopsum"><b>${esc(c.name)}</b> · ${fmt(Math.round(activeMs(tm)/60000))}</div>
+          <div class="label">${T("askPay")}</div>
+          <div class="row"><div class="mode" role="group"><button type="button" data-tpm="sum" aria-pressed="${S.payMode==="sum"}">${T("pmSum")}</button><button type="button" data-tpm="rate" aria-pressed="${S.payMode==="rate"}">${T("pmRate")}</button></div>
+          <label class="money"><span>$</span><input type="text" id="tPay" inputmode="decimal" class="mono" placeholder="${S.payMode==="rate"?T("ratePh"):T("sumPh")}"></label></div>
+          <p class="hint">${T("askPayHint")}</p>
+          <div class="row"><button class="primary" id="tSave">${T("savePay")}</button><button class="ghost" id="tNoPay">${T("noPay")}</button><button class="linkbtn" id="tBack">${T("backToTimer")}</button></div>
+        </div>`:`<div class="row"><button class="ghost pausebtn" id="tPause">${paused?"▶ "+T("resume"):"❚❚ "+T("pause")}</button><button class="primary" id="tStop">${T("stopLog")}</button><button class="ghost" id="tCancel">${T("reset")}</button></div>`}`;
+    const tp=$("tPay");if(tp){tp.value=timerPayDraft||(S.payMode==="rate"&&S.payRates[tm.cat]?S.payRates[tm.cat]:"");tp.addEventListener("input",()=>{timerPayDraft=tp.value});tp.addEventListener("keydown",e=>{if(e.key==="Enter")$("tSave").click()});setTimeout(()=>tp.focus(),50)}
     tick();
   }else{
     const c=S.cat?catInfo(S.cat):{name:"—",v:"--slate"};
@@ -646,7 +656,9 @@ function renderTimer(){
   }
 }
 // Timer with pauses: S.timer = {cat, start, pauses:[{s,e}], pausedAt}
-function pausedMs(tm,now){let p=(tm.pauses||[]).reduce((a,x)=>a+(x.e-x.s),0);if(tm.pausedAt)p+=now-tm.pausedAt;return p}
+function pausedMs(tm,now){let p=(tm.pauses||[]).reduce((a,x)=>a+(x.e-x.s),0);
+  if(tm.stopping){if(tm.wasPaused&&tm.pauseStart)p+=tm.pausedAt-tm.pauseStart;return p+(now-tm.pausedAt)}
+  if(tm.pausedAt)p+=now-tm.pausedAt;return p}
 function activeMs(tm,now=Date.now()){return Math.max(0,now-tm.start-pausedMs(tm,now))}
 function tick(){const c=$("clock");if(!c||!S.timer)return;const s=Math.floor(activeMs(S.timer)/1000);c.textContent=Math.floor(s/3600)+":"+pad(Math.floor(s/60)%60)+":"+pad(s%60)}
 setInterval(tick,1000);
@@ -765,6 +777,27 @@ function renderEditBar(){
   $("addBtn").textContent=on?T("saveChanges"):T("add");
   if(on){const moved=S.edit.date!==S.sel;$("editTxt").textContent=moved?T("editMove",{d:fD().format(parse(S.sel))}):T("editing")}
   $("addH").closest("section").classList.toggle("editing",on);
+}
+
+// ---------- finish the timer ----------
+// The end of the work is the moment Stop was pressed (time spent answering the pay question doesn't count).
+async function finishTimer(pay){
+  const tm0=S.timer;if(!tm0)return;
+  const end=tm0.stopping?tm0.pausedAt:Date.now();
+  // close any pause that was running before Stop
+  const pauses=[...(tm0.pauses||[])];
+  if(tm0.stopping){if(tm0.wasPaused&&tm0.pauseStart)pauses.push({s:tm0.pauseStart,e:end})}
+  else if(tm0.pausedAt)pauses.push({s:tm0.pausedAt,e:end});
+  const tm={...tm0,pauses,pausedAt:null,stopping:false};
+  const min=Math.floor(activeMs(tm,end)/60000);
+  S.timer=null;timerPayDraft="";
+  if(min<1){showMsg(T("timerShort"));render();saveSettings();return}
+  const st=new Date(tm.start),dayStart=new Date(st.getFullYear(),st.getMonth(),st.getDate()).getTime();
+  const breaks=pauses.filter(x=>x.e-x.s>=30e3).map(x=>({s:Math.round((x.s-dayStart)/60000),m:Math.max(1,Math.round((x.e-x.s)/60000))}));
+  const span=Math.round((end-tm.start)/60000);
+  await addEntry(tm.cat,min,"",toStr(st),pad(st.getHours())+":"+pad(st.getMinutes()),pay,breaks.length&&span>min?{span,breaks}:null);
+  showMsg(T("timerAdded",{t:fmt(min),c:catInfo(tm.cat).name})+(pay?" · "+fmtMoney(pay,true):""));
+  render();saveSettings();
 }
 
 // ---------- wheel picker ----------
@@ -950,15 +983,15 @@ function renderWeekDetail(){
   const un=all.filter(e=>e.s==null);
   $("wdnote").textContent=!all.length?T("wdEmpty"):un.length?T("wdNoTime",{n:un.length+" "+I18N[LANG].entries(un.length),t:fmt(un.reduce((a,e)=>a+e.min,0))}):"";
   // table
-  let rows=`<thead><tr><th>${T("thTime")}</th><th>${T("thCat")}</th><th>${T("thDur")}</th><th>${T("thPay")}</th><th>${T("thNote")}</th></tr></thead><tbody>`;
+  let rows=`<thead><tr><th>${T("thTime")}</th><th>${T("thCat")}</th><th>${T("thDur")}</th><th>${T("thPay")}</th><th>${T("thNote")}</th><th></th></tr></thead><tbody>`;
   days.forEach((d,i)=>{
     const list=sortedEntries(d);if(!list.length)return;
     const tot=list.reduce((a,e)=>a+e.min,0);
     const inc=dayIncome(d);
-    rows+=`<tr class="dsep"><td colspan="5">${cap(fDay().format(parse(d)))} · ${T("dayTotal",{t:fmt(tot)})}${inc?` · <span class="pay">${fmtMoney(inc,true)}</span>`:""}</td></tr>`;
-    (day(d).income||[]).forEach(x=>{rows+=`<tr><td class="mono">—</td><td>${T("income")}</td><td></td><td class="pay">${fmtMoney(+x.amount,true)}</td><td class="nt">${esc(x.src)}</td></tr>`});
+    rows+=`<tr class="dsep"><td colspan="6">${cap(fDay().format(parse(d)))} · ${T("dayTotal",{t:fmt(tot)})}${inc?` · <span class="pay">${fmtMoney(inc,true)}</span>`:""}</td></tr>`;
+    (day(d).income||[]).forEach(x=>{rows+=`<tr><td class="mono">—</td><td>${T("income")}</td><td></td><td class="pay">${fmtMoney(+x.amount,true)}</td><td class="nt">${esc(x.src)}</td><td class="acts"><button class="del red" data-wdeli="${d}|${x.id}" aria-label="×">×</button></td></tr>`});
     list.forEach(e=>{const c=catInfo(e.cat),s=toMin(e.start);
-      rows+=`<tr><td class="mono">${s!=null?whenTxt(e):"—"}</td><td><span class="cc" style="--c:var(${c.v})"><span class="dot"></span>${esc(c.name)}</span></td><td class="mono">${fmt(e.min)}</td><td class="pay">${e.pay?fmtMoney(+e.pay,true):""}</td><td class="nt">${breakTxt(e)?`<span class="brk">${breakTxt(e)}</span> `:""}${esc(e.note)}</td></tr>`});
+      rows+=`<tr><td class="mono">${s!=null?whenTxt(e):"—"}</td><td><span class="cc" style="--c:var(${c.v})"><span class="dot"></span>${esc(c.name)}</span></td><td class="mono">${fmt(e.min)}</td><td class="pay">${e.pay?fmtMoney(+e.pay,true):""}</td><td class="nt">${breakTxt(e)?`<span class="brk">${breakTxt(e)}</span> `:""}${esc(e.note)}</td><td class="acts"><button class="editbtn" data-wedit="${d}|${e.id}" aria-label="${T("editEntry")}" title="${T("editEntry")}">✎</button><button class="del red" data-wdel="${d}|${e.id}" aria-label="${T("deleteEntry")}" title="${T("deleteEntry")}">×</button></td></tr>`});
   });
   rows+="</tbody>";
   $("wt").innerHTML=all.length?rows:`<tbody><tr><td class="nt">${T("wdEmpty")}</td></tr></tbody>`;
@@ -995,8 +1028,12 @@ document.addEventListener("click",async ev=>{
   if(ds.tm){if(S.tmode!==ds.tm){S.tmode=ds.tm;try{localStorage.setItem("ps-tmode2",S.tmode)}catch(e){}renderTimeEntry();updatePayCalc()}return}
   if(ds.del){if(S.edit&&S.edit.id===ds.del)cancelEdit();delEntry(S.sel,ds.del);return}
   if(ds.edit){startEdit(ds.edit);return}
+  if(ds.wedit){const [d,id]=ds.wedit.split("|");selectDay(d);startEdit(id);return}
+  if(ds.wdel){const [d,id]=ds.wdel.split("|");if(S.edit&&S.edit.id===id)cancelEdit();setDay(d,{entries:day(d).entries.filter(x=>x.id!==id)});render();saveDay(d);showMsg(T("entryDeleted"));return}
+  if(ds.wdeli){const [d,id]=ds.wdeli.split("|");setDay(d,{income:(day(d).income||[]).filter(x=>x.id!==id)});render();saveDay(d);return}
   if(ds.day){selectDay(ds.day);return}
   if(ds.skin){const v=ds.skin==="classic"?"classic":"luxe";document.documentElement.dataset.skin=v;try{localStorage.setItem("ps-skin",v)}catch(e){}applyStatic();return}
+  if(ds.tpm){S.payMode=ds.tpm;timerPayDraft="";const tp=$("tPay");if(tp)tp.value="";renderTimer();renderPay();saveSettings();return}
   if(ds.pm){if(S.payMode!==ds.pm){S.payMode=ds.pm;$("payIn").value="";renderPay();renderTimer();saveSettings()}return}
   if(ds.wdr){S.wdRange=ds.wdr;renderWeekDetail();return}
   if(ds.mode){S.goalMode=ds.mode;render();saveSettings();return}
@@ -1100,21 +1137,21 @@ document.addEventListener("click",async ev=>{
       else S.timer={...tm,pausedAt:now};
       renderTimer();saveSettings();break;}
     case "tStop":{
-      const tm0=S.timer;if(!tm0)return;const now=Date.now();
-      const tm=tm0.pausedAt?{...tm0,pauses:[...(tm0.pauses||[]),{s:tm0.pausedAt,e:now}],pausedAt:null}:tm0;
-      const min=Math.round(activeMs(tm,now)/60000);
-      let pay=0;const tp=$("tPay");
-      if(tp&&tp.value.trim()&&min>=1){const v=parseAmount(tp.value);if(!isFinite(v)){showMsg(T("badAmount"),true);tp.focus();return}pay=S.payMode==="rate"?Math.round(v*min/60*100)/100:v;
-        if(S.payMode==="rate"&&S.payRates[tm.cat]!==v)S.payRates={...S.payRates,[tm.cat]:v}}
-      S.timer=null;timerPayDraft="";const st=new Date(tm.start);
-      if(min>=1){
-        // keep the pauses so the week grid can show them; minutes of day, relative to the start day
-        const s0=st.getHours()*60+st.getMinutes(),dayStart=new Date(st.getFullYear(),st.getMonth(),st.getDate()).getTime();
-        const breaks=(tm.pauses||[]).filter(x=>x.e-x.s>=30e3).map(x=>({s:Math.round((x.s-dayStart)/60000),m:Math.max(1,Math.round((x.e-x.s)/60000))}));
-        const span=Math.round((now-tm.start)/60000);
-        await addEntry(tm.cat,min,"",toStr(st),pad(st.getHours())+":"+pad(st.getMinutes()),pay,breaks.length&&span>min?{span,breaks}:null);showMsg(T("timerAdded",{t:fmt(min),c:catInfo(tm.cat).name})+(pay?" · "+fmtMoney(pay,true):""))}
-      else showMsg(T("timerShort"));
-      render();saveSettings();break;}
+      const tm=S.timer;if(!tm)return;
+      if(activeMs(tm)<60e3){S.timer=null;timerPayDraft="";showMsg(T("timerShort"));render();saveSettings();break}
+      // paid category: freeze the clock and ask about earnings first (nothing is saved yet)
+      if(catInfo(tm.cat).paid){const now=Date.now();S.timer={...tm,stopping:true,wasPaused:!!tm.pausedAt,pauseStart:tm.pausedAt||null,pausedAt:now};timerPayDraft="";renderTimer();saveSettings();break}
+      await finishTimer(0);break;}
+    case "tSave":{
+      const tp=$("tPay");let pay=0;
+      if(tp&&tp.value.trim()){const v=parseAmount(tp.value);if(!isFinite(v)){showMsg(T("badAmount"),true);tp.focus();return}
+        const min=Math.round(activeMs(S.timer)/60000);pay=S.payMode==="rate"?Math.round(v*min/60*100)/100:v;
+        if(S.payMode==="rate"&&S.payRates[S.timer.cat]!==v)S.payRates={...S.payRates,[S.timer.cat]:v}}
+      await finishTimer(pay);break;}
+    case "tNoPay":await finishTimer(0);break;
+    case "tBack":{const tm=S.timer;if(!tm)return;
+      // back to the running timer: the seconds spent on this screen still count as work
+      const t={...tm,stopping:false,pausedAt:tm.wasPaused?tm.pauseStart:null};delete t.wasPaused;delete t.pauseStart;S.timer=t;timerPayDraft="";renderTimer();saveSettings();break}
     case "tCancel":S.timer=null;timerPayDraft="";render();saveSettings();break;
   }
 });
