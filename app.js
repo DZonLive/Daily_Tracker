@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.10.0";
+const APP_VERSION="0.11.0";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -39,9 +39,12 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  errPopup:"The Google window couldn't open here. Try signing in with email instead.",errTooMany:"Too many attempts. Wait a bit and try again.",errGeneric:"Sign-in failed: {e}",
  updateText:"A new version is available",updateBtn:"Update",
  share:"Share",shareTitle:"Share the app",shareLead:"Send this link to a friend. They get their own empty tracker; your data stays private.",shareText:"Productivity Starter — a simple tracker for study, work, workouts and rest.",copyLink:"Copy",linkCopied:"Link copied ✓",copyManual:"Select the link and copy it.",
- income:"Income",incMonthTotal:"Earned this month",statWeek:"This week",statPerHour:"Per hour of work",perHourHint:"month income ÷ hours in “{c}”",statBest:"Best day",earnDays:"{n} paid days",
+ income:"Income",incMonthTotal:"Earned this month",statWeek:"This week",statPerHour:"Per hour of work",perHourHint:"month income ÷ hours in “{c}”",statBest:"Best day",earnDays:"paid days: {n}",
  addIncome:"Add income for {d}",amountPh:"Amount",srcPh:"Source (optional): job, client, gig…",noIncome:"No income on this day.",grossNote:"before taxes",
  incGoal:"Monthly income goal",goalHint:"empty or 0 = no goal",incGoalLeft:"{a} left to {b}",incGoalDone:"Goal reached ✓ {b}",badAmount:"Enter an amount, e.g. 85 or 120.50",incAdded:"Added {a}",dayIncome:"earned {a}",
+ payLabel:"Earned",pmSum:"Total",pmRate:"Per hour",sumPh:"e.g. 60",ratePh:"$ per hour",payOptional:"optional — leave empty if unpaid",pickDur:"pick how long you worked",perHourIs:"≈ {r} per hour",
+ thPay:"Earned",paidLabel:"income",perHourHint2:"month income ÷ hours in paid categories",legacyTitle:"Income added separately (older version)",
+ incHow:"Income is added when you log time in {c}: pick the category, the duration and fill in “Earned”.",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -93,6 +96,9 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  income:"Доход",incMonthTotal:"Заработано за месяц",statWeek:"За неделю",statPerHour:"За час работы",perHourHint:"доход за месяц ÷ часы в «{c}»",statBest:"Лучший день",earnDays:"дней с доходом: {n}",
  addIncome:"Добавить доход за {d}",amountPh:"Сумма",srcPh:"Откуда (необязательно): работа, клиент, подработка…",noIncome:"За этот день дохода нет.",grossNote:"до налогов",
  incGoal:"Цель по доходу на месяц",goalHint:"пусто или 0 — без цели",incGoalLeft:"до {b} осталось {a}",incGoalDone:"Цель достигнута ✓ {b}",badAmount:"Введи сумму, например 85 или 120.50",incAdded:"Добавлено {a}",dayIncome:"заработано {a}",
+ payLabel:"Заработок",pmSum:"Сумма",pmRate:"В час",sumPh:"напр. 60",ratePh:"$ в час",payOptional:"необязательно — оставь пустым, если не платили",pickDur:"выбери, сколько работал",perHourIs:"≈ {r} в час",
+ thPay:"Заработок",paidLabel:"доход",perHourHint2:"доход за месяц ÷ часы в оплачиваемых категориях",legacyTitle:"Доход, добавленный отдельно (старая версия)",
+ incHow:"Доход добавляется при записи времени в {c}: выбери категорию, длительность и заполни «Заработок».",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -129,14 +135,14 @@ const S={
   days:{},          // date -> {entries:[], tasks:[], note:""}
   cats:DEFAULT_CATS.map(c=>({...c})),
   goals:{...DEF_DAY}, wgoals:{...DEF_WEEK}, goalMode:"week",
-  timer:null, sel:todayStr(), month:null, cat:"study", dur:null, newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0,
+  timer:null, sel:todayStr(), month:null, cat:"study", dur:null, newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
 };
 S.month=monthOf(S.sel);
 
 function catInfo(k){
   const c=S.cats.find(x=>x.k===k);
-  if(!c)return {k,name:T("deleted"),v:"--slate",prod:false,off:true,missing:true};
-  return {k,name:c.name||T("cat_"+k),v:"--"+(COLORS.includes(c.color)?c.color:"slate"),prod:!!c.prod,off:!!c.off};
+  if(!c)return {k,name:T("deleted"),v:"--slate",prod:false,off:true,missing:true,paid:false};
+  return {k,name:c.name||T("cat_"+k),v:"--"+(COLORS.includes(c.color)?c.color:"slate"),prod:!!c.prod,off:!!c.off,paid:c.paid!=null?!!c.paid:k==="work"};
 }
 const activeCats=()=>S.cats.filter(c=>!c.off).map(c=>catInfo(c.k));
 
@@ -189,7 +195,7 @@ let user=null;           // {uid,email,name} when signed in
 let unsub=null;          // stops cloud listeners
 let lastSettingsJSON=""; // avoid re-writing settings that came from the server
 function queued(key,fn){const p=(queues[key]||Promise.resolve()).then(fn,fn);queues[key]=p.catch(()=>{});return p}
-function settingsBody(){return {type:"settings",cats:S.cats,goals:S.goals,wgoals:S.wgoals,goalMode:S.goalMode,timer:S.timer,lang:LANG,streakMin:S.streakMin,incomeGoal:S.incomeGoal}}
+function settingsBody(){return {type:"settings",cats:S.cats,goals:S.goals,wgoals:S.wgoals,goalMode:S.goalMode,timer:S.timer,lang:LANG,streakMin:S.streakMin,incomeGoal:S.incomeGoal,payMode:S.payMode,payRates:S.payRates}}
 function applySettings(v){
   if(!v)return;
   if(Array.isArray(v.cats)&&v.cats.length)S.cats=v.cats.map(c=>({...c}));
@@ -199,6 +205,8 @@ function applySettings(v){
   S.timer=v.timer||null;
   if(+v.streakMin>0)S.streakMin=+v.streakMin;
   if(v.incomeGoal!=null&&isFinite(+v.incomeGoal))S.incomeGoal=Math.max(0,+v.incomeGoal);
+  if(v.payMode==="sum"||v.payMode==="rate")S.payMode=v.payMode;
+  if(v.payRates&&typeof v.payRates==="object")S.payRates={...v.payRates};
   // language is a per-device choice; take it from the data only if this device hasn't picked one
   let chosen=null;try{chosen=localStorage.getItem("ps-lang")}catch(e){}
   if(!chosen&&(v.lang==="ru"||v.lang==="en")&&v.lang!==LANG){LANG=v.lang;try{localStorage.setItem("ps-lang",LANG)}catch(e){}}
@@ -408,8 +416,8 @@ if("serviceWorker" in navigator&&location.protocol!=="file:"){
 // ---------- actions ----------
 async function saveDay(date){try{await (store&&store.saveDay(date))}catch(err){showMsg(T("notSaved",{e:err.message||err.code||"error"}),true)}}
 function saveSettings(){return store?store.saveSettings().catch(()=>showMsg(T("settingsFail"),true)):Promise.resolve()}
-async function addEntry(cat,min,note,date,start){
-  const e={id:uid(),cat,min:Math.round(min),note:note||"",at:Date.now()};if(start)e.start=start;
+async function addEntry(cat,min,note,date,start,pay){
+  const e={id:uid(),cat,min:Math.round(min),note:note||"",at:Date.now()};if(start)e.start=start;if(pay>0)e.pay=pay;
   setDay(date,{entries:[...day(date).entries,e]});render();await saveDay(date);
 }
 async function delEntry(date,id){setDay(date,{entries:day(date).entries.filter(e=>e.id!==id)});render();await saveDay(date)}
@@ -482,13 +490,14 @@ function render(){
     +`<button type="button" class="addcat" id="goNewCat">${T("addCat")}</button>`;
   $("durs").innerHTML=DURS.map(d=>{const H=T("h"),M=T("m");return `<button type="button" data-dur="${d}" aria-pressed="${S.dur===d}">${d<60?d+M:(d%60?(d/60).toString().replace(".",LANG==="ru"?",":".")+H:d/60+H)}</button>`}).join("");
   renderTimer();
+  renderPay();
 
   // journal
   const list=sortedEntries(sel);
   $("logCount").textContent=list.length?list.length+" "+I18N[LANG].entries(list.length):"";
   $("log").innerHTML=list.length?list.map(e=>{const c=catInfo(e.cat);const s=toMin(e.start);
     const when=s!=null?fromMin(s)+"–"+fromMin(s+e.min):T("noTime");
-    return `<li style="--c:var(${c.v})"><span class="when">${when}</span><span class="dot"></span><span class="k">${esc(c.name)}</span><span class="t">${fmt(e.min)}</span><span class="n">${esc(e.note)}</span><button class="del" data-del="${e.id}" aria-label="×">×</button></li>`}).join("")
+    return `<li style="--c:var(${c.v})"><span class="when">${when}</span><span class="dot"></span><span class="k">${esc(c.name)}</span><span class="t">${fmt(e.min)}</span><span class="n">${e.pay?`<span class="pay">${fmtMoney(+e.pay,true)}</span> `:""}${esc(e.note)}</span><button class="del" data-del="${e.id}" aria-label="×">×</button></li>`}).join("")
     :`<li class="empty">${T("emptyLog")}</li>`;
 
   renderWeek();
@@ -546,14 +555,18 @@ function renderTimeline(){
   $("tlnote").textContent=un?T("unplaced",{n:un+" "+I18N[LANG].entries(un),t:fmt(unMin)}):(list.length?"":T("tlEmpty"));
 }
 
+let timerPayDraft="";
 function renderTimer(){
+  if(document.activeElement&&document.activeElement.id==="tPay"&&S.timer)return; // don't wipe what is being typed
   const el=$("timer"),tm=S.timer;
   if(tm){
     const c=catInfo(tm.cat);
     el.className="timer on";el.style.setProperty("--c",`var(${c.v})`);
     el.innerHTML=`<span class="label">${T("running")}</span><div class="clock" id="clock">0:00:00</div>
       <div class="what"><span class="pulse"></span><b>${esc(c.name)}</b> · ${T("since",{s:new Date(tm.start).toLocaleTimeString(loc(),{hour:"2-digit",minute:"2-digit"})})}</div>
+      ${c.paid?`<div class="payrow"><span class="label">${T("payLabel")}</span><label class="money"><span>$</span><input type="text" id="tPay" inputmode="decimal" class="mono" placeholder="${S.payMode==="rate"?T("ratePh"):T("sumPh")}"></label><span class="paycalc">${S.payMode==="rate"?T("pmRate"):T("pmSum")}</span></div>`:""}
       <div class="row"><button class="primary" id="tStop">${T("stopLog")}</button><button class="ghost" id="tCancel">${T("reset")}</button></div>`;
+    const tp=$("tPay");if(tp){tp.value=timerPayDraft||(S.payMode==="rate"&&S.payRates[tm.cat]?S.payRates[tm.cat]:"");tp.addEventListener("input",()=>{timerPayDraft=tp.value})}
     tick();
   }else{
     const c=S.cat?catInfo(S.cat):{name:"—",v:"--slate"};
@@ -609,7 +622,30 @@ function renderStreak(){
 
 // ---------- income ----------
 const fmtMoney=(x,cents)=>{x=Math.round((x||0)*100)/100;const f=cents||Math.round(x)!==x?2:0;return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:f,maximumFractionDigits:f}).format(x)};
-const dayIncome=date=>(day(date).income||[]).reduce((a,x)=>a+(+x.amount||0),0);
+const dayIncome=date=>{const d=day(date);return d.entries.reduce((a,e)=>a+(+e.pay||0),0)+(d.income||[]).reduce((a,x)=>a+(+x.amount||0),0)};
+// What the pay field turns into for a given duration: a sum, or rate x hours
+function payFromInput(min,cat){
+  const raw=$("payIn").value;if(!raw.trim())return 0;
+  const v=parseAmount(raw);if(!isFinite(v))return NaN;
+  return S.payMode==="rate"?Math.round(v*min/60*100)/100:v;
+}
+function currentDur(){const raw=$("durIn").value;const m=raw.trim()?parseDur(raw):S.dur;return isFinite(m)&&m>0?m:null}
+function renderPay(){
+  const row=$("payRow");const c=S.cat?catInfo(S.cat):null;
+  row.hidden=!(c&&c.paid);if(row.hidden)return;
+  $("pm-sum").setAttribute("aria-pressed",S.payMode==="sum");$("pm-rate").setAttribute("aria-pressed",S.payMode==="rate");
+  const inp=$("payIn");inp.placeholder=S.payMode==="rate"?T("ratePh"):T("sumPh");
+  if(S.payMode==="rate"&&!inp.value&&S.payRates[S.cat]&&document.activeElement!==inp)inp.value=S.payRates[S.cat];
+  updatePayCalc();
+}
+function updatePayCalc(){
+  const el=$("payCalc");const min=currentDur();const raw=$("payIn").value.trim();
+  if(!raw){el.textContent=T("payOptional");return}
+  const v=parseAmount(raw);if(!isFinite(v)){el.textContent="";return}
+  if(!min){el.innerHTML=S.payMode==="rate"?T("pickDur"):"";return}
+  if(S.payMode==="rate")el.innerHTML=`${fmt(min)} × ${fmtMoney(v,true)} = <b>${fmtMoney(v*min/60,true)}</b>`;
+  else el.innerHTML=T("perHourIs",{r:"<b>"+fmtMoney(v/(min/60),true)+"</b>"});
+}
 const monthDays=m=>{const d=parse(m),n=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();return [...Array(n)].map((_,i)=>m.slice(0,8)+pad(i+1))};
 function parseAmount(raw){const s=String(raw||"").replace(/[$\s]/g,"").replace(",",".");if(!/^\d+(\.\d{1,2})?$/.test(s))return NaN;const v=+s;return v>0&&v<1e6?Math.round(v*100)/100:NaN}
 function renderIncome(){
@@ -622,7 +658,7 @@ function renderIncome(){
   $("incGoalBox").innerHTML=g?`<div class="incgoal"><div class="bar"><i style="width:${Math.min(100,total/g*100)}%"></i></div><span>${total>=g?T("incGoalDone",{b:"<b>"+fmtMoney(g)+"</b>"}):T("incGoalLeft",{a:"<b>"+fmtMoney(g-total)+"</b>",b:fmtMoney(g)})}</span></div>`:"";
   // stats
   const ws=weekStart(sel);let wk=0;for(let i=0;i<7;i++)wk+=dayIncome(addDays(ws,i));
-  let workMin=0;days.forEach(d=>{workMin+=dayTotals(d).work||0});
+  let workMin=0;days.forEach(d=>{const t=dayTotals(d);for(const k in t)if(catInfo(k).paid)workMin+=t[k]});
   const perH=workMin>=30?total/(workMin/60):null;
   let best=-1,bestD=null;vals.forEach((v,i)=>{if(v>best&&v>0){best=v;bestD=days[i]}});
   const earnDays=vals.filter(v=>v>0).length;
@@ -630,7 +666,7 @@ function renderIncome(){
   $("incStats").innerHTML=
      st(sel===today?T("today"):cap(fDay().format(parse(sel))),fmtMoney(dayIncome(sel)))
     +st(T("statWeek"),fmtMoney(wk),fD().format(parse(ws))+" – "+fD().format(parse(addDays(ws,6))))
-    +st(T("statPerHour"),perH!=null?fmtMoney(perH,true):"—",T("perHourHint",{c:esc(catInfo("work").name)}))
+    +st(T("statPerHour"),perH!=null?fmtMoney(perH,true):"—",T("perHourHint2"))
     +st(T("statBest"),bestD?fmtMoney(best):"—",bestD?fD().format(parse(bestD))+" · "+T("earnDays",{n:earnDays}):"");
   // chart
   const max=Math.max(...vals,0);
@@ -641,27 +677,16 @@ function renderIncome(){
   const cols=days.map((d,i)=>{const v=vals[i],n=i+1;const cls=["mcol"];if(!v)cls.push("zero");if(d===today)cls.push("today");if(d===sel)cls.push("sel");if(lbl.has(n))cls.push("lbl");
     return `<button type="button" class="${cls.join(" ")}" data-day="${d}" title="${fD().format(parse(d))}: ${fmtMoney(v,true)}"><span class="b" style="height:${v/top*150}px"></span><span class="mlab">${n}</span></button>`}).join("");
   $("mchart").innerHTML=`<div class="grid">${grid}</div><div class="mcols" style="grid-template-columns:repeat(${days.length},minmax(0,1fr))">${cols}</div>`;
-  // add + list for the selected day
-  $("incAddTitle").textContent=T("addIncome",{d:sel===today?T("today").toLowerCase():fD().format(parse(sel))});
-  const list=day(sel).income||[];
-  $("incList").innerHTML=list.length?list.map(x=>`<li><span class="amt">${fmtMoney(+x.amount,true)}</span><span class="tx">${esc(x.src)}</span><button class="del" data-idel="${x.id}" aria-label="×">×</button></li>`).join(""):`<li class="empty">${T("noIncome")}</li>`;
-  const srcs=[];Object.keys(S.days).sort().reverse().forEach(k=>(day(k).income||[]).forEach(x=>{if(x.src&&!srcs.includes(x.src))srcs.push(x.src)}));
-  $("incSrcList").innerHTML=srcs.slice(0,20).map(x=>`<option value="${esc(x)}"></option>`).join("");
+  // how to add + older stand-alone income records (from v0.10.0) for the selected day
+  const q=LANG==="ru"?["«","»"]:["“","”"];const paidNames=activeCats().filter(c=>c.paid).map(c=>q[0]+esc(c.name)+q[1]).join(", ")||"—";
+  $("incHow").innerHTML=T("incHow",{c:paidNames});
+  const legacy=day(sel).income||[];
+  $("incLegacy").hidden=!legacy.length;
+  $("incList").innerHTML=legacy.map(x=>`<li><span class="amt">${fmtMoney(+x.amount,true)}</span><span class="tx">${esc(x.src)}</span><button class="del" data-idel="${x.id}" aria-label="×">×</button></li>`).join("");
   const gi=$("incGoal");if(document.activeElement!==gi)gi.value=g||"";
   // day summary line
   const di=dayIncome(sel);$("dayIncome").textContent=di?"· "+T("dayIncome",{a:fmtMoney(di)}):"";
 }
-function addIncome(){
-  const a=parseAmount($("incAmt").value);
-  if(!isFinite(a)){incMsg(T("badAmount"),"err");$("incAmt").focus();return}
-  const src=$("incSrc").value.trim().slice(0,40);
-  const date=S.sel;
-  setDay(date,{income:[...(day(date).income||[]),{id:uid(),amount:a,src,at:Date.now()}]});
-  $("incAmt").value="";$("incSrc").value="";
-  render();saveDay(date);incMsg(T("incAdded",{a:fmtMoney(a,true)}),"ok");
-}
-function incMsg(t,k){const m=$("incMsg");m.textContent=t;m.className="datamsg"+(k?" "+k:"");clearTimeout(incMsg.t);incMsg.t=setTimeout(()=>{m.textContent=""},3000)}
-
 // ---------- week detail ----------
 function renderWeekDetail(){
   const ws=weekStart(S.sel),days=[...Array(7)].map((_,i)=>addDays(ws,i)),today=todayStr(),dow=I18N[LANG].dow;
@@ -686,7 +711,7 @@ function renderWeekDetail(){
       const a=Math.max(e.s,h0*60),b=Math.min(e.s+e.min,h1*60,1440);if(b<=a)return;
       const top=(a-h0*60)/60*HH,ht=Math.max(4,(b-a)/60*HH-1),c=catInfo(e.cat);
       const time=fromMin(e.s)+"–"+fromMin(e.s+e.min);
-      evs+=`<button type="button" class="ev" data-day="${d}" style="--c:var(${c.v});top:${top}px;height:${ht}px" title="${esc(c.name)} · ${time} · ${fmt(e.min)}${e.note?" · "+esc(e.note):""}">${ht>=16?`<b>${esc(c.name)}</b>`:""}${ht>=30?`<span>${time}</span>`:""}</button>`;
+      evs+=`<button type="button" class="ev" data-day="${d}" style="--c:var(${c.v});top:${top}px;height:${ht}px" title="${esc(c.name)} · ${time} · ${fmt(e.min)}${e.pay?" · "+fmtMoney(+e.pay,true):""}${e.note?" · "+esc(e.note):""}">${ht>=16?`<b>${esc(c.name)}</b>`:""}${ht>=30?`<span>${time}</span>`:""}</button>`;
     });
     if(d===today){const n=new Date(),m=n.getHours()*60+n.getMinutes();if(m>=h0*60&&m<=h1*60)evs+=`<div class="nowl" style="top:${(m-h0*60)/60*HH}px"></div>`}
     html+=`<div class="dcol${d===today?" today":""}" style="height:${H}px;--hh:${HH}px">${evs}</div>`;
@@ -695,13 +720,15 @@ function renderWeekDetail(){
   const un=all.filter(e=>e.s==null);
   $("wdnote").textContent=!all.length?T("wdEmpty"):un.length?T("wdNoTime",{n:un.length+" "+I18N[LANG].entries(un.length),t:fmt(un.reduce((a,e)=>a+e.min,0))}):"";
   // table
-  let rows=`<thead><tr><th>${T("thTime")}</th><th>${T("thCat")}</th><th>${T("thDur")}</th><th>${T("thNote")}</th></tr></thead><tbody>`;
+  let rows=`<thead><tr><th>${T("thTime")}</th><th>${T("thCat")}</th><th>${T("thDur")}</th><th>${T("thPay")}</th><th>${T("thNote")}</th></tr></thead><tbody>`;
   days.forEach((d,i)=>{
     const list=sortedEntries(d);if(!list.length)return;
     const tot=list.reduce((a,e)=>a+e.min,0);
-    rows+=`<tr class="dsep"><td colspan="4">${cap(fDay().format(parse(d)))} · ${T("dayTotal",{t:fmt(tot)})}</td></tr>`;
+    const inc=dayIncome(d);
+    rows+=`<tr class="dsep"><td colspan="5">${cap(fDay().format(parse(d)))} · ${T("dayTotal",{t:fmt(tot)})}${inc?` · <span class="pay">${fmtMoney(inc,true)}</span>`:""}</td></tr>`;
+    (day(d).income||[]).forEach(x=>{rows+=`<tr><td class="mono">—</td><td>${T("income")}</td><td></td><td class="pay">${fmtMoney(+x.amount,true)}</td><td class="nt">${esc(x.src)}</td></tr>`});
     list.forEach(e=>{const c=catInfo(e.cat),s=toMin(e.start);
-      rows+=`<tr><td class="mono">${s!=null?fromMin(s)+"–"+fromMin(s+e.min):"—"}</td><td><span class="cc" style="--c:var(${c.v})"><span class="dot"></span>${esc(c.name)}</span></td><td class="mono">${fmt(e.min)}</td><td class="nt">${esc(e.note)}</td></tr>`});
+      rows+=`<tr><td class="mono">${s!=null?fromMin(s)+"–"+fromMin(s+e.min):"—"}</td><td><span class="cc" style="--c:var(${c.v})"><span class="dot"></span>${esc(c.name)}</span></td><td class="mono">${fmt(e.min)}</td><td class="pay">${e.pay?fmtMoney(+e.pay,true):""}</td><td class="nt">${esc(e.note)}</td></tr>`});
   });
   rows+="</tbody>";
   $("wt").innerHTML=all.length?rows:`<tbody><tr><td class="nt">${T("wdEmpty")}</td></tr></tbody>`;
@@ -720,6 +747,7 @@ function renderCatManager(){
         <input type="text" id="cn-${c.k}" data-cname="${c.k}" value="${esc(ci.name)}" maxlength="24" aria-label="${esc(ci.name)}">
         <label class="gl"><input type="number" min="0" step="${weekly?0.5:15}" id="cg-${c.k}" data-goal="${c.k}" value="${weekly?+(v/60).toFixed(1):v}" class="mono"><span>${T(weekly?"hPerWeek":"mPerDay")}</span></label>
         <label class="chk"><input type="checkbox" id="cp-${c.k}" data-cprod="${c.k}" ${c.prod?"checked":""}><span>${T("prodLabel")}</span></label>
+        <label class="chk"><input type="checkbox" id="cpay-${c.k}" data-cpaid="${c.k}" ${ci.paid?"checked":""}><span>${T("paidLabel")}</span></label>
         <button class="small" data-coff="${c.k}">${c.off?T("show"):T("hide")}</button></div>`}).join("");
   }
   $("ncSw").innerHTML=COLORS.map(col=>`<button type="button" class="sw" style="--c:var(--${col})" data-ncol="${col}" aria-pressed="${S.newColor===col}" aria-label="${col}"></button>`).join("");
@@ -730,10 +758,11 @@ document.addEventListener("click",async ev=>{
   const b=ev.target.closest("button");if(!b)return;
   const ds=b.dataset;
   if(ds.lang){if(ds.lang!==LANG){LANG=ds.lang;try{localStorage.setItem("ps-lang",LANG)}catch(e){}render();saveSettings()}return}
-  if(ds.cat){S.cat=ds.cat;render();return}
+  if(ds.cat){if(S.cat!==ds.cat){S.cat=ds.cat;$("payIn").value=S.payMode==="rate"&&S.payRates[ds.cat]?S.payRates[ds.cat]:""}render();return}
   if(ds.dur){const d=+ds.dur;S.dur=S.dur===d?null:d;$("durIn").value="";render();return}
   if(ds.del){delEntry(S.sel,ds.del);return}
   if(ds.day){selectDay(ds.day);return}
+  if(ds.pm){if(S.payMode!==ds.pm){S.payMode=ds.pm;$("payIn").value="";renderPay();renderTimer();saveSettings()}return}
   if(ds.wdr){S.wdRange=ds.wdr;renderWeekDetail();return}
   if(ds.mode){S.goalMode=ds.mode;render();saveSettings();return}
   if(ds.idel){setDay(S.sel,{income:(day(S.sel).income||[]).filter(x=>x.id!==ds.idel)});render();saveDay(S.sel);return}
@@ -763,7 +792,6 @@ document.addEventListener("click",async ev=>{
       const nextCol=COLORS.find(col=>!S.cats.some(c=>c.color===col));if(nextCol)S.newColor=nextCol;
       render();saveSettings();showCatMsg(T("catAdded",{c:name}));break;}
     case "taskAdd":addTask();break;
-    case "incAdd":addIncome();break;
     case "iPrev":S.month=addMonths(S.month,-1);renderCalendar();renderIncome();break;
     case "iNext":S.month=addMonths(S.month,1);renderCalendar();renderIncome();break;
     case "exportBtn":exportBackup();break;
@@ -787,17 +815,29 @@ document.addEventListener("click",async ev=>{
       if(!isFinite(min)||min<=0||min>1440){showMsg(T("badDur"),true);return}
       let start=$("startIn").value||null;
       if(!start&&S.sel===todayStr()){const n=new Date();const s=n.getHours()*60+n.getMinutes()-min;if(s>=0)start=fromMin(s)}
-      const cn=catInfo(S.cat).name;
-      await addEntry(S.cat,min,$("noteIn").value.trim(),S.sel,start);
-      showMsg(T("added",{t:fmt(min),c:cn})+(start?T("addedAt",{s:start}):""));
-      $("durIn").value="";$("noteIn").value="";$("startIn").value="";S.dur=null;render();break;}
+      const ci=catInfo(S.cat),cn=ci.name;
+      let pay=0;
+      if(ci.paid){
+        pay=payFromInput(min,S.cat);
+        if(!isFinite(pay)){showMsg(T("badAmount"),true);$("payIn").focus();return}
+        if(pay&&S.payMode==="rate"){const r=parseAmount($("payIn").value);if(S.payRates[S.cat]!==r){S.payRates={...S.payRates,[S.cat]:r};saveSettings()}}
+      }
+      await addEntry(S.cat,min,$("noteIn").value.trim(),S.sel,start,pay);
+      showMsg(T("added",{t:fmt(min),c:cn})+(start?T("addedAt",{s:start}):"")+(pay?" · "+fmtMoney(pay,true):""));
+      $("durIn").value="";$("noteIn").value="";$("startIn").value="";S.dur=null;
+      if(S.payMode!=="rate")$("payIn").value="";
+      render();break;}
     case "tStart":if(!S.cat)return;S.timer={cat:S.cat,start:Date.now()};render();saveSettings();break;
     case "tStop":{
-      const tm=S.timer;if(!tm)return;const min=Math.round((Date.now()-tm.start)/60000);S.timer=null;const st=new Date(tm.start);
-      if(min>=1){await addEntry(tm.cat,min,"",toStr(st),pad(st.getHours())+":"+pad(st.getMinutes()));showMsg(T("timerAdded",{t:fmt(min),c:catInfo(tm.cat).name}))}
+      const tm=S.timer;if(!tm)return;const min=Math.round((Date.now()-tm.start)/60000);
+      let pay=0;const tp=$("tPay");
+      if(tp&&tp.value.trim()&&min>=1){const v=parseAmount(tp.value);if(!isFinite(v)){showMsg(T("badAmount"),true);tp.focus();return}pay=S.payMode==="rate"?Math.round(v*min/60*100)/100:v;
+        if(S.payMode==="rate"&&S.payRates[tm.cat]!==v)S.payRates={...S.payRates,[tm.cat]:v}}
+      S.timer=null;timerPayDraft="";const st=new Date(tm.start);
+      if(min>=1){await addEntry(tm.cat,min,"",toStr(st),pad(st.getHours())+":"+pad(st.getMinutes()),pay);showMsg(T("timerAdded",{t:fmt(min),c:catInfo(tm.cat).name})+(pay?" · "+fmtMoney(pay,true):""))}
       else showMsg(T("timerShort"));
       render();saveSettings();break;}
-    case "tCancel":S.timer=null;render();saveSettings();break;
+    case "tCancel":S.timer=null;timerPayDraft="";render();saveSettings();break;
   }
 });
 function showCatMsg(t){showMsg(t);const h=$("goalHint");const old=h.textContent;h.textContent=t;clearTimeout(showCatMsg.t);showCatMsg.t=setTimeout(()=>{h.textContent=T(S.goalMode==="week"?"hintWeek":"hintDay")},3000)}
@@ -808,11 +848,11 @@ function addTask(){
 document.addEventListener("change",e=>{
   const ds=e.target.dataset;
   if(ds.tk){setDay(S.sel,{tasks:day(S.sel).tasks.map(x=>x.id===ds.tk?{...x,done:e.target.checked}:x)});render();saveDay(S.sel);return}
+  if(ds.cpaid){S.cats=S.cats.map(c=>c.k===ds.cpaid?{...c,paid:e.target.checked}:c);render();saveSettings();return}
   if(ds.cprod){S.cats=S.cats.map(c=>c.k===ds.cprod?{...c,prod:e.target.checked}:c);render();saveSettings();return}
   if(ds.cname){const v=e.target.value.trim();S.cats=S.cats.map(c=>{if(c.k!==ds.cname)return c;const n={...c};if(v&&v!==T("cat_"+c.k))n.name=v;else delete n.name;return n});render();saveSettings();return}
 });
 $("taskIn").addEventListener("keydown",e=>{if(e.key==="Enter")addTask()});
-["incAmt","incSrc"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")addIncome()}));
 let igT;$("incGoal").addEventListener("input",e=>{const v=Math.max(0,Math.round(+e.target.value||0));S.incomeGoal=v;renderIncome();clearTimeout(igT);igT=setTimeout(saveSettings,700)});
 $("acctPass").addEventListener("keydown",e=>{if(e.key==="Enter")doAuth("in")});
 $("acct").addEventListener("click",e=>{if(e.target===$("acct"))$("acct").close()});
@@ -824,7 +864,9 @@ $("noteArea").addEventListener("input",e=>{
   clearTimeout(noteTimer);noteTimer=setTimeout(flushNote,800);
 });
 $("noteArea").addEventListener("blur",()=>{flushNote();renderCalendar()});
-$("durIn").addEventListener("input",()=>{if(S.dur!==null){S.dur=null;document.querySelectorAll("#durs button").forEach(x=>x.setAttribute("aria-pressed","false"))}});
+$("payIn").addEventListener("input",updatePayCalc);
+$("payIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()});
+$("durIn").addEventListener("input",()=>{updatePayCalc();if(S.dur!==null){S.dur=null;document.querySelectorAll("#durs button").forEach(x=>x.setAttribute("aria-pressed","false"))}});
 ["durIn","noteIn","startIn"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()}));
 let goalT;
 $("catlist").addEventListener("input",e=>{

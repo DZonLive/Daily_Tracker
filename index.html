@@ -102,6 +102,15 @@
         <div class="field">
           <span class="label" data-t="howLong"></span>
           <div class="durs" id="durs"></div>
+          <div class="payrow" id="payRow" hidden>
+            <span class="label" data-t="payLabel"></span>
+            <div class="mode" role="group">
+              <button type="button" data-pm="sum" id="pm-sum" data-t="pmSum"></button>
+              <button type="button" data-pm="rate" id="pm-rate" data-t="pmRate"></button>
+            </div>
+            <label class="money"><span>$</span><input type="text" id="payIn" inputmode="decimal" class="mono"></label>
+            <span class="paycalc mono" id="payCalc"></span>
+          </div>
           <div class="row">
             <label class="inp w-dur"><span data-t="custom"></span><input type="text" id="durIn" class="mono" placeholder="1:20" inputmode="decimal"></label>
             <label class="inp w-time"><span data-t="start"></span><input type="time" id="startIn" class="mono"></label>
@@ -166,15 +175,9 @@
       <div class="inc-stats" id="incStats"></div>
     </div>
     <div class="mchart" id="mchart"></div>
-    <div class="inc-add">
-      <h3><span id="incAddTitle"></span><span class="prog" data-t="grossNote"></span></h3>
-      <div class="row">
-        <label class="money"><span>$</span><input type="text" id="incAmt" inputmode="decimal" class="mono" data-tp="amountPh"></label>
-        <input type="text" id="incSrc" class="grow" list="incSrcList" maxlength="40" data-tp="srcPh">
-        <datalist id="incSrcList"></datalist>
-        <button class="primary" id="incAdd" data-t="add"></button>
-      </div>
-      <div class="datamsg" id="incMsg"></div>
+    <p class="hint inc-how" id="incHow"></p>
+    <div class="inc-legacy" id="incLegacy" hidden>
+      <h3><span data-t="legacyTitle"></span></h3>
       <ul class="tasks inclist" id="incList"></ul>
     </div>
     <div class="streakset">

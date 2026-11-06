@@ -3,6 +3,13 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.11.0 (beta) — 2026-11-05
+- Income is now entered together with work time: pick Work, the duration, and fill in "Earned" (a total or a per-hour rate, which is remembered). The separate income form is gone.
+- Earnings show in the day log, the week table (new "Earned" column and day totals) and the week grid tooltips.
+- Timer: a running paid category has an "Earned" field that is saved when you stop.
+- Categories can be marked as "income" (Work is by default), e.g. for a second job.
+- Income added with the separate form in 0.10.0 is kept and still counted.
+
 ## 0.10.0 (beta) — 2026-11-05
 - New: Income section. Add what you earned on any day (amount + optional source), see totals for the day, week and month, a month chart, best day, a monthly goal, and earnings per hour of logged work. Amounts are before taxes, in USD.
 

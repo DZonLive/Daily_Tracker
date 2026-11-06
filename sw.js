@@ -10,7 +10,7 @@
 // Caching:
 //  - App code (html, js, css, manifest): network first, cached copy when offline -> always fresh when online.
 //  - Icons, fonts and the Firebase SDK (versioned URLs): cache first.
-const VERSION = "0.10.0";
+const VERSION = "0.11.0";
 const CACHE = "productivity-starter-" + VERSION;
 const SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./cloud.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
