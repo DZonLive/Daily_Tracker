@@ -105,31 +105,21 @@
             <button type="button" data-tm="range" id="tm-range" data-t="tmRange"></button>
           </div>
           <div id="durBox" class="tbox">
-            <div class="steppers">
-              <div class="stepper">
-                <button type="button" class="stepbtn" data-step="h:-1" aria-label="−1 h">−</button>
-                <input type="number" id="dH" min="0" max="23" inputmode="numeric" class="mono" aria-label="hours">
-                <span class="unit" data-t="hoursU"></span>
-                <button type="button" class="stepbtn" data-step="h:1" aria-label="+1 h">+</button>
-              </div>
-              <div class="stepper">
-                <button type="button" class="stepbtn" data-step="m:-15" aria-label="−15 min">−</button>
-                <input type="number" id="dM" min="0" max="59" step="5" inputmode="numeric" class="mono" aria-label="minutes">
-                <span class="unit" data-t="minsU"></span>
-                <button type="button" class="stepbtn" data-step="m:15" aria-label="+15 min">+</button>
-              </div>
+            <div class="tiles">
+              <button type="button" class="tile big" id="durTile"><span class="tlab" data-t="durL"></span><span class="tv" id="durVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button type="button" class="tile" id="startTile"><span class="tlab" data-t="startedAt"></span><span class="tv" id="startVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             </div>
             <div class="durs" id="durs"></div>
-            <label class="inp w-start"><span data-t="startedAt"></span><input type="time" id="startIn" class="mono"></label>
           </div>
           <div id="rangeBox" class="tbox" hidden>
-            <div class="rangerow">
-              <label class="inp"><span data-t="rStartL"></span><input type="time" id="rStart" class="mono"></label>
+            <div class="tiles range">
+              <button type="button" class="tile big" id="rStartTile"><span class="tlab" data-t="rStartL"></span><span class="tv" id="rStartVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
               <span class="arrow" aria-hidden="true">→</span>
-              <label class="inp"><span data-t="rEndL"></span><input type="time" id="rEnd" class="mono"></label>
-              <button type="button" class="ghost nowbtn" id="rNow" data-t="nowBtn"></button>
+              <button type="button" class="tile big" id="rEndTile"><span class="tlab" data-t="rEndL"></span><span class="tv" id="rEndVal"></span><svg class="caret" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             </div>
+            <div class="rangesum" id="rangeSum"></div>
           </div>
+          <input type="hidden" id="startIn"><input type="hidden" id="rStart"><input type="hidden" id="rEnd">
           <div class="payrow" id="payRow" hidden>
             <span class="label" data-t="payLabel"></span>
             <div class="mode" role="group">
@@ -137,7 +127,7 @@
               <button type="button" data-pm="rate" id="pm-rate" data-t="pmRate"></button>
             </div>
             <label class="money"><span>$</span><input type="text" id="payIn" inputmode="decimal" class="mono"></label>
-            <span class="paycalc mono" id="payCalc"></span>
+            <span class="paycalc" id="payCalc"></span>
           </div>
           <div class="row">
             <label class="inp grow"><span data-t="note"></span><input type="text" id="noteIn" data-tp="notePh"></label>
@@ -309,6 +299,18 @@
       <button class="primary" id="shareCopy" data-t="copyLink"></button>
     </div>
     <div class="datamsg ok" id="shareCopied"></div>
+  </div>
+</dialog>
+
+<dialog id="wheelDlg" class="wheeldlg" aria-labelledby="wheelTitle">
+  <div class="wsheet">
+    <div class="whead">
+      <button type="button" class="linkbtn" id="wCancel" data-t="cancel"></button>
+      <div class="wtitle"><div id="wheelTitle"></div><div class="wnow mono" id="wheelValue"></div></div>
+      <button type="button" class="primary wdone" id="wDone" data-t="done"></button>
+    </div>
+    <div class="wcols" id="wheelCols"></div>
+    <div class="wextra" id="wheelExtra"></div>
   </div>
 </dialog>
 

@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.12.1";
+const APP_VERSION="0.13.0";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -45,9 +45,10 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  payLabel:"Earned",pmSum:"Total",pmRate:"Per hour",sumPh:"e.g. 60",ratePh:"$ per hour",payOptional:"optional — leave empty if unpaid",pickDur:"pick how long you worked",perHourIs:"≈ {r} per hour",
  thPay:"Earned",paidLabel:"income",perHourHint2:"month income ÷ hours in paid categories",legacyTitle:"Income added separately (older version)",
  incHow:"Income is added when you log time in {c}: pick the category, the duration and fill in “Earned”.",
- tmDur:"How long",tmRange:"From – to",hoursU:"h",minsU:"min",startedAt:"Started at (optional)",rStartL:"Start",rEndL:"End",nowBtn:"Now",
- pvDur:"Set how long: use − / + or a quick button",pvRange:"Set when you started and finished",pvNeedStart:"Set the start time",pvNeedEnd:"Set the end time",sameTimes:"Start and end are the same",
+ tmDur:"How long",tmRange:"From – to",hoursU:"h",minsU:"min",startedAt:"Started at",rStartL:"Start",rEndL:"End",nowBtn:"Now",
+ pvDur:"Choose how long: tap Duration or a quick button",pvRange:"Set when you started and finished",pvNeedStart:"Set the start time",pvNeedEnd:"Set the end time",sameTimes:"Start and end are the same",
  pvJustNow:"ends now — set “Started at” if it was earlier",pvOvernight:"goes past midnight",pvNoTime:"no start time — counts in totals, not shown on the day timeline",
+ durL:"Duration",tapToPick:"Tap to choose",optional:"optional",startedAtT:"Started at",clearTime:"No start time",cancel:"Cancel",done:"Done",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -102,9 +103,10 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  payLabel:"Заработок",pmSum:"Сумма",pmRate:"В час",sumPh:"напр. 60",ratePh:"$ в час",payOptional:"необязательно — оставь пустым, если не платили",pickDur:"выбери, сколько работал",perHourIs:"≈ {r} в час",
  thPay:"Заработок",paidLabel:"доход",perHourHint2:"доход за месяц ÷ часы в оплачиваемых категориях",legacyTitle:"Доход, добавленный отдельно (старая версия)",
  incHow:"Доход добавляется при записи времени в {c}: выбери категорию, длительность и заполни «Заработок».",
- tmDur:"Сколько времени",tmRange:"С … до …",hoursU:"ч",minsU:"мин",startedAt:"Начал в (необязательно)",rStartL:"Начало",rEndL:"Конец",nowBtn:"Сейчас",
- pvDur:"Укажи, сколько: кнопки − / + или быстрый выбор",pvRange:"Укажи, во сколько начал и закончил",pvNeedStart:"Укажи время начала",pvNeedEnd:"Укажи время конца",sameTimes:"Начало и конец совпадают",
+ tmDur:"Сколько времени",tmRange:"С … до …",hoursU:"ч",minsU:"мин",startedAt:"Начал в",rStartL:"Начало",rEndL:"Конец",nowBtn:"Сейчас",
+ pvDur:"Выбери, сколько: нажми «Длительность» или быструю кнопку",pvRange:"Укажи, во сколько начал и закончил",pvNeedStart:"Укажи время начала",pvNeedEnd:"Укажи время конца",sameTimes:"Начало и конец совпадают",
  pvJustNow:"закончил только что — укажи «Начал в», если было раньше",pvOvernight:"через полночь",pvNoTime:"без времени начала — попадёт в итоги, но не на шкалу дня",
+ durL:"Длительность",tapToPick:"Нажми, чтобы выбрать",optional:"необязательно",startedAtT:"Начал в",clearTime:"Без времени",cancel:"Отмена",done:"Готово",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -638,9 +640,13 @@ function renderTimeEntry(){
   $("durBox").hidden=!isDur;$("rangeBox").hidden=isDur;
   const cur=durMin();
   $("durs").innerHTML=DURS.map(d=>`<button type="button" data-dur="${d}" aria-pressed="${cur===d}">${chipLabel(d)}</button>`).join("");
-  if(document.activeElement!==$("dH"))$("dH").value=S.dh;
-  if(document.activeElement!==$("dM"))$("dM").value=pad(S.dm);
-  $("rNow").hidden=S.sel!==todayStr();
+  const tileVal=(id,v,empty)=>{const el=$(id);el.textContent=v||T(empty);el.classList.toggle("empty",!v);el.parentElement.classList.toggle("set",!!v)};
+  tileVal("durVal",cur?fmt(cur):"","tapToPick");
+  tileVal("startVal",$("startIn").value,"optional");
+  tileVal("rStartVal",$("rStart").value,"tapToPick");
+  tileVal("rEndVal",$("rEnd").value,"tapToPick");
+  const r=S.tmode==="range"?readTime():null;
+  $("rangeSum").innerHTML=r&&r.min?`= <b>${fmt(r.min)}</b>${r.overnight?" · "+T("pvOvernight"):""}`:"";
   updatePreview();
 }
 function setDur(min){min=Math.max(0,Math.min(23*60+59,Math.round(min)));S.dh=Math.floor(min/60);S.dm=min%60;renderTimeEntry();updatePayCalc()}
@@ -673,6 +679,76 @@ function updatePreview(){
   const dayTxt=S.sel===todayStr()?T("today").toLowerCase():fD().format(parse(S.sel));
   el.className="preview ok";el.style.setProperty("--c",`var(${c.v})`);
   el.innerHTML=`<span class="dot"></span><b>${esc(c.name)}</b>${when?" · "+when:""} · <span class="pvt">${fmt(r.min)}</span>${pay?` · <span class="pay">${fmtMoney(pay,true)}</span>`:""} · ${esc(dayTxt)}${notes.length?`<span class="pvs">${notes.join(" · ")}</span>`:""}`;
+}
+
+// ---------- wheel picker ----------
+// A bottom sheet (centered on computers) with scroll wheels like a phone alarm clock.
+// Scroll with a finger or mouse wheel, use the arrow buttons, or the keyboard (↑ ↓).
+const W_ITEM=44;
+let wheel=null; // {cols:[{values,el,view}], format, onDone}
+function openWheel(o){
+  const box=$("wheelCols");box.innerHTML="";
+  wheel={cols:[],format:o.format,onDone:o.onDone};
+  o.cols.forEach((c,ci)=>{
+    if(ci&&o.sep){const sp=document.createElement("div");sp.className="wsep";sp.textContent=o.sep;box.appendChild(sp)}
+    const col=document.createElement("div");col.className="wcol";
+    col.innerHTML=`<button type="button" class="warr" data-wa="-1" aria-label="up">▲</button>
+      <div class="wwrap"><div class="wband"></div><div class="wview" tabindex="0" role="listbox" aria-label="${esc(c.unit||"")}"><div class="wpad"></div>${c.labels.map((l,i)=>`<div class="witem" data-wi="${i}" role="option">${l}</div>`).join("")}<div class="wpad"></div></div></div>
+      <button type="button" class="warr" data-wa="1" aria-label="down">▼</button>${c.unit?`<div class="wunit">${esc(c.unit)}</div>`:""}`;
+    box.appendChild(col);
+    const view=col.querySelector(".wview");
+    const entry={values:c.values,view,idx:0};wheel.cols.push(entry);
+    let t=null;
+    view.addEventListener("scroll",()=>{const i=Math.max(0,Math.min(c.values.length-1,Math.round(view.scrollTop/W_ITEM)));if(i!==entry.idx){entry.idx=i;markWheel()}clearTimeout(t);t=setTimeout(()=>{view.scrollTo({top:entry.idx*W_ITEM,behavior:"smooth"})},140)},{passive:true});
+    view.addEventListener("keydown",e=>{if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();moveWheel(entry,e.key==="ArrowDown"?1:-1)}else if(e.key==="Enter"){e.preventDefault();$("wDone").click()}});
+    col.addEventListener("click",e=>{const a=e.target.closest("[data-wa]");if(a){moveWheel(entry,+a.dataset.wa);return}const it=e.target.closest("[data-wi]");if(it){entry.idx=+it.dataset.wi;view.scrollTo({top:entry.idx*W_ITEM,behavior:"smooth"});markWheel()}});
+    entry.start=nearestIndex(c.values,c.value);
+  });
+  $("wheelTitle").textContent=o.title;
+  $("wheelExtra").innerHTML=(o.extra||[]).map((x,i)=>`<button type="button" class="ghost" data-wx="${i}">${esc(x.label)}</button>`).join("");
+  wheel.extra=o.extra||[];
+  const d=$("wheelDlg");try{d.showModal()}catch(e){d.setAttribute("open","")}
+  requestAnimationFrame(()=>{wheel.cols.forEach(c=>{c.idx=c.start;c.view.scrollTop=c.idx*W_ITEM});markWheel();wheel.cols[0].view.focus({preventScroll:true})});
+}
+function nearestIndex(values,v){let best=0,bd=Infinity;values.forEach((x,i)=>{const d=Math.abs(x-v);if(d<bd){bd=d;best=i}});return best}
+function moveWheel(c,dir){c.idx=Math.max(0,Math.min(c.values.length-1,c.idx+dir));c.view.scrollTo({top:c.idx*W_ITEM,behavior:"smooth"});markWheel()}
+function setWheel(vals){wheel.cols.forEach((c,i)=>{c.idx=nearestIndex(c.values,vals[i]);c.view.scrollTo({top:c.idx*W_ITEM,behavior:"smooth"})});markWheel()}
+function wheelValues(){return wheel.cols.map(c=>c.values[c.idx])}
+function markWheel(){
+  wheel.cols.forEach(c=>c.view.querySelectorAll(".witem").forEach((el,i)=>el.classList.toggle("on",i===c.idx)));
+  $("wheelValue").textContent=wheel.format(wheelValues());
+}
+$("wDone").addEventListener("click",()=>{if(!wheel)return;const v=wheelValues(),cb=wheel.onDone;$("wheelDlg").close();cb(v)});
+$("wCancel").addEventListener("click",()=>$("wheelDlg").close());
+$("wheelDlg").addEventListener("click",e=>{if(e.target===$("wheelDlg"))$("wheelDlg").close();const x=e.target.closest("[data-wx]");if(x&&wheel)wheel.extra[+x.dataset.wx].fn()});
+$("wheelDlg").addEventListener("close",()=>{wheel&&wheel.after&&wheel.after();});
+
+const HOURS=[...Array(24)].map((_,i)=>i);
+const MINS5=[...Array(12)].map((_,i)=>i*5);
+function nowMin(round){const n=new Date();const m=n.getHours()*60+n.getMinutes();return round==="down"?Math.floor(m/5)*5:Math.round(m/5)*5%1440}
+function pickDuration(){
+  const cur=durMin()||60;
+  openWheel({title:T("durL"),cols:[
+      {values:HOURS,labels:HOURS.map(String),value:Math.floor(cur/60),unit:T("hoursU")},
+      {values:MINS5,labels:MINS5.map(pad),value:cur%60,unit:T("minsU")}],
+    format:v=>fmt(v[0]*60+v[1])||"0",
+    onDone:v=>{const m=v[0]*60+v[1];setDur(m)}});
+}
+// id = hidden input that holds "HH:MM"
+function pickTime(id,titleKey,opt={}){
+  const el=$(id);let cur=toMin(el.value);
+  if(cur==null){
+    if(id==="rEnd"&&toMin($("rStart").value)!=null)cur=(toMin($("rStart").value)+60)%1440;
+    else cur=S.sel===todayStr()?nowMin("down"):(id==="rEnd"?17*60:9*60);
+  }
+  const extra=[];
+  if(S.sel===todayStr())extra.push({label:T("nowBtn"),fn:()=>{const m=nowMin();setWheel([Math.floor(m/60),m%60])}});
+  if(opt.clear&&el.value)extra.push({label:T("clearTime"),fn:()=>{el.value="";$("wheelDlg").close();renderTimeEntry();updatePayCalc()}});
+  openWheel({title:T(titleKey),sep:":",cols:[
+      {values:HOURS,labels:HOURS.map(pad),value:Math.floor(cur/60)},
+      {values:MINS5,labels:MINS5.map(pad),value:cur%60}],
+    format:v=>pad(v[0])+":"+pad(v[1]),extra,
+    onDone:v=>{el.value=pad(v[0])+":"+pad(v[1]);renderTimeEntry();updatePayCalc();if(opt.then)setTimeout(opt.then,250)}});
 }
 
 // ---------- income ----------
@@ -816,7 +892,6 @@ document.addEventListener("click",async ev=>{
   if(ds.lang){if(ds.lang!==LANG){LANG=ds.lang;try{localStorage.setItem("ps-lang",LANG)}catch(e){}render();saveSettings()}return}
   if(ds.cat){if(S.cat!==ds.cat){S.cat=ds.cat;$("payIn").value=S.payMode==="rate"&&S.payRates[ds.cat]?S.payRates[ds.cat]:""}render();return}
   if(ds.dur){setDur(+ds.dur);return}
-  if(ds.step){const [u,n]=ds.step.split(":");setDur(durMin()+(u==="h"?+n*60:+n));return}
   if(ds.tm){if(S.tmode!==ds.tm){S.tmode=ds.tm;try{localStorage.setItem("ps-tmode",S.tmode)}catch(e){}renderTimeEntry();updatePayCalc()}return}
   if(ds.del){delEntry(S.sel,ds.del);return}
   if(ds.day){selectDay(ds.day);return}
@@ -880,10 +955,13 @@ document.addEventListener("click",async ev=>{
       }
       await addEntry(S.cat,min,$("noteIn").value.trim(),S.sel,start,pay);
       showMsg(T("added",{t:fmt(min),c:cn})+(start?T("addedAt",{s:start}):"")+(pay?" · "+fmtMoney(pay,true):""));
-      $("noteIn").value="";$("startIn").value="";$("rStart").value="";$("rEnd").value="";S.dh=0;S.dm=0;
+      $("noteIn").value="";$("startIn").value="";$("rStart").value="";$("rEnd").value="";S.dh=0;S.dm=0;renderTimeEntry();
       if(S.payMode!=="rate")$("payIn").value="";
       render();break;}
-    case "rNow":{const n=new Date();$("rEnd").value=pad(n.getHours())+":"+pad(n.getMinutes());updatePayCalc();break}
+    case "durTile":pickDuration();break;
+    case "startTile":pickTime("startIn","startedAtT",{clear:true});break;
+    case "rStartTile":pickTime("rStart","rStartL",{then:()=>{if(!$("rEnd").value)pickTime("rEnd","rEndL")}});break;
+    case "rEndTile":pickTime("rEnd","rEndL");break;
     case "tStart":if(!S.cat)return;S.timer={cat:S.cat,start:Date.now()};render();saveSettings();break;
     case "tStop":{
       const tm=S.timer;if(!tm)return;const min=Math.round((Date.now()-tm.start)/60000);
@@ -923,16 +1001,7 @@ $("noteArea").addEventListener("input",e=>{
 $("noteArea").addEventListener("blur",()=>{flushNote();renderCalendar()});
 $("payIn").addEventListener("input",updatePayCalc);
 $("payIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()});
-function readSteppers(){
-  let h=Math.floor(+$("dH").value||0),m=Math.floor(+$("dM").value||0);
-  h=Math.max(0,Math.min(23,h));m=Math.max(0,Math.min(59,m));
-  S.dh=h;S.dm=m;
-  document.querySelectorAll("#durs button").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.dur===durMin()));
-  updatePayCalc();
-}
-["dH","dM"].forEach(id=>{$(id).addEventListener("input",readSteppers);$(id).addEventListener("blur",()=>{renderTimeEntry()});$(id).addEventListener("focus",e=>e.target.select())});
-["startIn","rStart","rEnd"].forEach(id=>$(id).addEventListener("input",updatePayCalc));
-["dH","dM","noteIn","startIn","rStart","rEnd"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()}));
+$("noteIn").addEventListener("keydown",e=>{if(e.key==="Enter")$("addBtn").click()});
 let goalT;
 $("catlist").addEventListener("input",e=>{
   const k=e.target.dataset.goal;if(!k)return;const n=Math.max(0,+e.target.value||0);

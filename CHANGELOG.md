@@ -3,6 +3,10 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.13.0 (beta) — 2026-11-06
+- Time is now picked with scroll wheels (like a phone alarm clock) in a pop-up: hours and minutes columns, arrows ▲ ▼, mouse wheel and keyboard. 24-hour format, no AM/PM.
+- Big tiles show the chosen duration / start / end; after picking the start, the end picker opens by itself; "Now" button in the picker
+
 ## 0.12.1 (beta) — 2026-11-06
 - Fix: updates show up right after they are published (the app no longer reuses files the browser cached for up to 10 minutes)
 
