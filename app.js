@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.14.0";
+const APP_VERSION="0.15.0";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -50,6 +50,9 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  pvJustNow:"ends now — set “Started at” if it was earlier",pvOvernight:"goes past midnight",pvNoTime:"no start time — counts in totals, not shown in the week grid",
  durL:"Duration",tapToPick:"Tap to choose",optional:"optional",startedAtT:"Started at",clearTime:"No start time",cancel:"Cancel",done:"Done",
  removeGoal:"Remove goal",goalRemoved:"Goal removed",
+ use12:"12 h (AM/PM)",use24:"24 h",timeFmt:"Time format",pause:"Pause",resume:"Resume",onPause:"Paused",pausesN:"breaks: {n} ({t})",pausedFor:"break {t}",
+ pickColor:"Choose color",colorsTitle:"Color",colorsMain:"Main",colorsMore:"More colors",colorsCustom:"Your own color",useColor:"Use",
+ lookLabel:"Look",lookLuxe:"Luxe",lookClassic:"Classic",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -109,6 +112,9 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  pvJustNow:"закончил только что — укажи «Начал в», если было раньше",pvOvernight:"через полночь",pvNoTime:"без времени начала — попадёт в итоги, но не в недельную сетку",
  durL:"Длительность",tapToPick:"Нажми, чтобы выбрать",optional:"необязательно",startedAtT:"Начал в",clearTime:"Без времени",cancel:"Отмена",done:"Готово",
  removeGoal:"Убрать цель",goalRemoved:"Цель убрана",
+ use12:"12 ч (AM/PM)",use24:"24 ч",timeFmt:"Формат времени",pause:"Пауза",resume:"Продолжить",onPause:"На паузе",pausesN:"пауз: {n} ({t})",pausedFor:"пауза {t}",
+ pickColor:"Выбрать цвет",colorsTitle:"Цвет",colorsMain:"Основные",colorsMore:"Ещё цвета",colorsCustom:"Свой цвет",useColor:"Выбрать",
+ lookLabel:"Оформление",lookLuxe:"Люкс",lookClassic:"Классика",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -145,15 +151,38 @@ const S={
   days:{},          // date -> {entries:[], tasks:[], note:""}
   cats:DEFAULT_CATS.map(c=>({...c})),
   goals:{...DEF_DAY}, wgoals:{...DEF_WEEK}, goalMode:"week",
-  timer:null, sel:todayStr(), month:null, cat:"study", dh:0, dm:0, tmode:"range", newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
+  timer:null, sel:todayStr(), month:null, cat:"study", dh:0, dm:0, tmode:"range", clock12:false, newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
 };
 S.month=monthOf(S.sel);
 try{const tm=localStorage.getItem("ps-tmode2");if(tm==="dur"||tm==="range")S.tmode=tm}catch(e){}
 
+// Category colors: a theme token ("study", "sky"…) or any custom "#rrggbb" picked from the palette.
+// Custom colors become CSS variables --cc-<key> so every place that uses var(--…) keeps working.
+const EXTRA_COLORS=["#c0392b","#e0603a","#e8a33d","#d4b44a","#9aae3b","#4f9d69","#2f8f83","#2a7fa8","#3f63c7","#6a4fc4","#9b4fb8","#c2508f",
+  "#8c5a3c","#b08a5a","#5b6b7a","#2e3440","#a3a8b3","#e6c79c"];
+const isHex=c=>/^#[0-9a-f]{6}$/i.test(c||"");
+function catVar(c){if(COLORS.includes(c.color))return "--"+c.color;if(isHex(c.color))return "--cc-"+c.k;return "--slate"}
+const colorCss=col=>isHex(col)?col:`var(--${COLORS.includes(col)?col:"slate"})`;
+function syncCatColors(){
+  let el=$("catColors");if(!el){el=document.createElement("style");el.id="catColors";document.head.appendChild(el)}
+  const css=S.cats.filter(c=>isHex(c.color)).map(c=>`--cc-${c.k}:${c.color};`).join("");
+  el.textContent=css?`:root{${css}}`:"";
+}
+let colorCb=null;
+function openColors(current,cb){
+  colorCb=cb;
+  const sw=(col,label)=>`<button type="button" class="sw big" style="--c:${colorCss(col)}" data-pick="${col}" aria-pressed="${current===col}" aria-label="${esc(label||col)}"></button>`;
+  $("colPresets").innerHTML=COLORS.map(c=>sw(c)).join("");
+  $("colExtra").innerHTML=EXTRA_COLORS.map(c=>sw(c)).join("");
+  $("colCustom").value=isHex(current)?current:"#7a6cf0";
+  try{$("colorDlg").showModal()}catch(e){$("colorDlg").setAttribute("open","")}
+}
+function pickColor(col){const cb=colorCb;colorCb=null;$("colorDlg").close();if(cb)cb(col)}
+
 function catInfo(k){
   const c=S.cats.find(x=>x.k===k);
   if(!c)return {k,name:T("deleted"),v:"--slate",prod:false,off:true,missing:true,paid:false};
-  return {k,name:c.name||T("cat_"+k),v:"--"+(COLORS.includes(c.color)?c.color:"slate"),prod:!!c.prod,off:!!c.off,paid:c.paid!=null?!!c.paid:k==="work"};
+  return {k,name:c.name||T("cat_"+k),v:catVar(c),prod:!!c.prod,off:!!c.off,paid:c.paid!=null?!!c.paid:k==="work"};
 }
 const activeCats=()=>S.cats.filter(c=>!c.off).map(c=>catInfo(c.k));
 
@@ -169,7 +198,10 @@ function weekStart(s){const d=parse(s);const wd=(d.getDay()+6)%7;d.setDate(d.get
 function fmt(min){min=Math.round(min);const h=Math.floor(min/60),m=min%60,H=T("h"),M=T("m");if(!h)return m+" "+M;if(!m)return h+" "+H;return h+" "+H+" "+m+" "+M}
 function fmtShort(min){min=Math.round(min);return Math.floor(min/60)+":"+pad(min%60)}
 function toMin(hhmm){if(!hhmm)return null;const [h,m]=hhmm.split(":").map(Number);return isFinite(h)&&isFinite(m)?h*60+m:null}
-function fromMin(x){x=((Math.round(x)%1440)+1440)%1440;return pad(Math.floor(x/60))+":"+pad(x%60)}
+function fromMin(x){x=((Math.round(x)%1440)+1440)%1440;return pad(Math.floor(x/60))+":"+pad(x%60)} // storage format, always 24 h
+// Display format follows the user's choice: 24 h ("13:05") or 12 h ("1:05 PM")
+function clock(x){x=((Math.round(x)%1440)+1440)%1440;const h=Math.floor(x/60),m=x%60;if(!S.clock12)return pad(h)+":"+pad(m);return ((h%12)||12)+":"+pad(m)+" "+(h<12?"AM":"PM")}
+const clockStr=hhmm=>{const m=toMin(hhmm);return m==null?"":clock(m)};
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const fDay=()=>new Intl.DateTimeFormat(loc(),{weekday:"short",day:"numeric",month:"long"});
@@ -206,7 +238,7 @@ let user=null;           // {uid,email,name} when signed in
 let unsub=null;          // stops cloud listeners
 let lastSettingsJSON=""; // avoid re-writing settings that came from the server
 function queued(key,fn){const p=(queues[key]||Promise.resolve()).then(fn,fn);queues[key]=p.catch(()=>{});return p}
-function settingsBody(){return {type:"settings",cats:S.cats,goals:S.goals,wgoals:S.wgoals,goalMode:S.goalMode,timer:S.timer,lang:LANG,streakMin:S.streakMin,incomeGoal:S.incomeGoal,payMode:S.payMode,payRates:S.payRates}}
+function settingsBody(){return {type:"settings",cats:S.cats,goals:S.goals,wgoals:S.wgoals,goalMode:S.goalMode,timer:S.timer,lang:LANG,streakMin:S.streakMin,incomeGoal:S.incomeGoal,payMode:S.payMode,payRates:S.payRates,clock12:S.clock12}}
 function applySettings(v){
   if(!v)return;
   if(Array.isArray(v.cats)&&v.cats.length)S.cats=v.cats.map(c=>({...c}));
@@ -218,6 +250,7 @@ function applySettings(v){
   if(v.incomeGoal!=null&&isFinite(+v.incomeGoal))S.incomeGoal=Math.max(0,+v.incomeGoal);
   if(v.payMode==="sum"||v.payMode==="rate")S.payMode=v.payMode;
   if(v.payRates&&typeof v.payRates==="object")S.payRates={...v.payRates};
+  if(typeof v.clock12==="boolean")S.clock12=v.clock12;
   // language is a per-device choice; take it from the data only if this device hasn't picked one
   let chosen=null;try{chosen=localStorage.getItem("ps-lang")}catch(e){}
   if(!chosen&&(v.lang==="ru"||v.lang==="en")&&v.lang!==LANG){LANG=v.lang;try{localStorage.setItem("ps-lang",LANG)}catch(e){}}
@@ -403,30 +436,42 @@ async function openInstall(){
 }
 
 // Service worker: offline support + "new version" banner.
-// A new version activates by itself. The banner appears only when it arrives while this page is
-// already open (the page still runs the old code); after any reload the page is current and no banner shows.
+// While the app is open it checks the server for a newer version (on start, every 5 minutes, when the app
+// comes back to the screen and when the internet returns). The banner shows only if the published version
+// differs from the one running, so it never appears right after a reload that already loaded the new code.
+async function serverVersion(){
+  try{const r=await fetch("sw.js?v="+Date.now(),{cache:"no-store"});const t=await r.text();const m=t.match(/VERSION\s*=\s*"([^"]+)"/);return m?m[1]:null}catch(e){return null}
+}
+function newer(a,b){const x=a.split(".").map(Number),y=b.split(".").map(Number);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)>(y[i]||0)}return false}
+let swReg=null,lastCheck=0;
+async function checkForUpdate(force){
+  if(!force&&Date.now()-lastCheck<60e3)return;lastCheck=Date.now();
+  if(swReg)swReg.update().catch(()=>{});
+  const v=await serverVersion();
+  if(v&&newer(v,APP_VERSION))$("updateBar").hidden=false;
+}
 if("serviceWorker" in navigator&&location.protocol!=="file:"){
-  const hadController=!!navigator.serviceWorker.controller;
-  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadController)$("updateBar").hidden=false});
-  $("updateBtn").addEventListener("click",()=>{flushNote();location.reload()});
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{checkForUpdate(true)});
+  $("updateBtn").addEventListener("click",()=>{flushNote();$("updateBtn").disabled=true;location.reload()});
   window.addEventListener("load",async()=>{
     try{
-      const reg=await navigator.serviceWorker.register("sw.js",{updateViaCache:"none"});
-      // an older version may still be waiting from before this fix: let it take over
-      if(reg.waiting)reg.waiting.postMessage("skipWaiting");
-      // check for updates when the app comes back to the foreground, at most every 30 min
-      let last=Date.now();
-      document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&Date.now()-last>30*60e3){last=Date.now();reg.update().catch(()=>{})}});
+      swReg=await navigator.serviceWorker.register("sw.js",{updateViaCache:"none"});
+      if(swReg.waiting)swReg.waiting.postMessage("skipWaiting");
     }catch(e){}
+    setTimeout(()=>checkForUpdate(true),8000);
+    setInterval(()=>{if(document.visibilityState==="visible")checkForUpdate(true)},5*60e3);
+    document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkForUpdate()});
+    window.addEventListener("online",()=>checkForUpdate(true));
   });
 }
+
 
 
 // ---------- actions ----------
 async function saveDay(date){try{await (store&&store.saveDay(date))}catch(err){showMsg(T("notSaved",{e:err.message||err.code||"error"}),true)}}
 function saveSettings(){return store?store.saveSettings().catch(()=>showMsg(T("settingsFail"),true)):Promise.resolve()}
-async function addEntry(cat,min,note,date,start,pay){
-  const e={id:uid(),cat,min:Math.round(min),note:note||"",at:Date.now()};if(start)e.start=start;if(pay>0)e.pay=pay;
+async function addEntry(cat,min,note,date,start,pay,extra){
+  const e={id:uid(),cat,min:Math.round(min),note:note||"",at:Date.now()};if(start)e.start=start;if(pay>0)e.pay=pay;if(extra)Object.assign(e,extra);
   setDay(date,{entries:[...day(date).entries,e]});render();await saveDay(date);
 }
 async function delEntry(date,id){setDay(date,{entries:day(date).entries.filter(e=>e.id!==id)});render();await saveDay(date)}
@@ -456,6 +501,7 @@ function applyStatic(){
   document.querySelectorAll("[data-t]").forEach(el=>el.textContent=T(el.dataset.t));
   document.querySelectorAll("[data-tp]").forEach(el=>el.placeholder=T(el.dataset.tp));
   document.querySelectorAll("[data-ta]").forEach(el=>el.setAttribute("aria-label",T(el.dataset.ta)));
+  const sk=document.documentElement.dataset.skin||"luxe";$("skin-luxe").setAttribute("aria-pressed",sk==="luxe");$("skin-classic").setAttribute("aria-pressed",sk==="classic");
   $("lang-en").setAttribute("aria-pressed",LANG==="en");$("lang-ru").setAttribute("aria-pressed",LANG==="ru");
   $("status").textContent=T(statusKey,statusVar);
   $("verBadge").textContent="Beta · v"+APP_VERSION;$("footVer").textContent="Productivity Starter v"+APP_VERSION+" beta";
@@ -463,6 +509,7 @@ function applyStatic(){
 }
 
 function render(){
+  syncCatColors();
   applyStatic();
   const sel=S.sel,isToday=sel===todayStr();
   $("dayLabel").textContent=cap(fDay().format(parse(sel)));
@@ -508,8 +555,8 @@ function render(){
   const list=sortedEntries(sel);
   $("logCount").textContent=list.length?list.length+" "+I18N[LANG].entries(list.length):"";
   $("log").innerHTML=list.length?list.map(e=>{const c=catInfo(e.cat);const s=toMin(e.start);
-    const when=s!=null?fromMin(s)+"–"+fromMin(s+e.min):T("noTime");
-    return `<li style="--c:var(${c.v})"><span class="when">${when}</span><span class="dot"></span><span class="k">${esc(c.name)}</span><span class="t">${fmt(e.min)}</span><span class="n">${e.pay?`<span class="pay">${fmtMoney(+e.pay,true)}</span> `:""}${esc(e.note)}</span><button class="del" data-del="${e.id}" aria-label="×">×</button></li>`}).join("")
+    const when=s!=null?whenTxt(e):T("noTime");
+    return `<li style="--c:var(${c.v})"><span class="when">${when}</span><span class="dot"></span><span class="k">${esc(c.name)}</span><span class="t">${fmt(e.min)}</span><span class="n">${breakTxt(e)?`<span class="brk">${breakTxt(e)}</span> `:""}${e.pay?`<span class="pay">${fmtMoney(+e.pay,true)}</span> `:""}${esc(e.note)}</span><button class="del" data-del="${e.id}" aria-label="×">×</button></li>`}).join("")
     :`<li class="empty">${T("emptyLog")}</li>`;
 
   renderWeek();
@@ -518,6 +565,9 @@ function render(){
   renderIncome();
   renderCatManager();
 }
+const spanOf=e=>+e.span>e.min?+e.span:e.min;
+function whenTxt(e){const s=toMin(e.start);return s==null?null:clock(s)+"–"+clock(s+spanOf(e))}
+function breakTxt(e){const b=Math.max(0,spanOf(e)-e.min);return b?T("pausedFor",{t:fmt(b)}):""}
 function sortedEntries(date){
   return day(date).entries.slice().sort((a,b)=>{const sa=toMin(a.start),sb=toMin(b.start);
     if(sa!=null&&sb!=null)return sa-sb;if(sa!=null)return -1;if(sb!=null)return 1;return a.at-b.at});
@@ -574,11 +624,12 @@ function renderTimer(){
   const el=$("timer"),tm=S.timer;
   if(tm){
     const c=catInfo(tm.cat);
-    el.className="timer on";el.style.setProperty("--c",`var(${c.v})`);
-    el.innerHTML=`<span class="label">${T("running")}</span><div class="clock" id="clock">0:00:00</div>
-      <div class="what"><span class="pulse"></span><b>${esc(c.name)}</b> · ${T("since",{s:new Date(tm.start).toLocaleTimeString(loc(),{hour:"2-digit",minute:"2-digit"})})}</div>
+    const paused=!!tm.pausedAt,st=new Date(tm.start),np=(tm.pauses||[]).length+(paused?1:0);
+    el.className="timer on"+(paused?" paused":"");el.style.setProperty("--c",`var(${c.v})`);
+    el.innerHTML=`<span class="label">${T(paused?"onPause":"running")}</span><div class="clock" id="clock">0:00:00</div>
+      <div class="what">${paused?"":`<span class="pulse"></span>`}<b>${esc(c.name)}</b> · ${T("since",{s:clock(st.getHours()*60+st.getMinutes())})}${np?` · ${T("pausesN",{n:np,t:fmt(Math.round(pausedMs(tm,Date.now())/60000))})}`:""}</div>
       ${c.paid?`<div class="payrow"><span class="label">${T("payLabel")}</span><label class="money"><span>$</span><input type="text" id="tPay" inputmode="decimal" class="mono" placeholder="${S.payMode==="rate"?T("ratePh"):T("sumPh")}"></label><span class="paycalc">${S.payMode==="rate"?T("pmRate"):T("pmSum")}</span></div>`:""}
-      <div class="row"><button class="primary" id="tStop">${T("stopLog")}</button><button class="ghost" id="tCancel">${T("reset")}</button></div>`;
+      <div class="row"><button class="ghost pausebtn" id="tPause">${paused?"▶ "+T("resume"):"❚❚ "+T("pause")}</button><button class="primary" id="tStop">${T("stopLog")}</button><button class="ghost" id="tCancel">${T("reset")}</button></div>`;
     const tp=$("tPay");if(tp){tp.value=timerPayDraft||(S.payMode==="rate"&&S.payRates[tm.cat]?S.payRates[tm.cat]:"");tp.addEventListener("input",()=>{timerPayDraft=tp.value})}
     tick();
   }else{
@@ -589,7 +640,10 @@ function renderTimer(){
       <div class="row"><button class="primary" id="tStart" ${S.cat?"":"disabled"}>${T("go")}</button></div>`;
   }
 }
-function tick(){const c=$("clock");if(!c||!S.timer)return;const s=Math.max(0,Math.floor((Date.now()-S.timer.start)/1000));c.textContent=Math.floor(s/3600)+":"+pad(Math.floor(s/60)%60)+":"+pad(s%60)}
+// Timer with pauses: S.timer = {cat, start, pauses:[{s,e}], pausedAt}
+function pausedMs(tm,now){let p=(tm.pauses||[]).reduce((a,x)=>a+(x.e-x.s),0);if(tm.pausedAt)p+=now-tm.pausedAt;return p}
+function activeMs(tm,now=Date.now()){return Math.max(0,now-tm.start-pausedMs(tm,now))}
+function tick(){const c=$("clock");if(!c||!S.timer)return;const s=Math.floor(activeMs(S.timer)/1000);c.textContent=Math.floor(s/3600)+":"+pad(Math.floor(s/60)%60)+":"+pad(s%60)}
 setInterval(tick,1000);
 
 function renderWeek(){
@@ -645,9 +699,9 @@ function renderTimeEntry(){
   $("durs").innerHTML=DURS.map(d=>`<button type="button" data-dur="${d}" aria-pressed="${cur===d}">${chipLabel(d)}</button>`).join("");
   const tileVal=(id,v,empty)=>{const el=$(id);el.textContent=v||T(empty);el.classList.toggle("empty",!v);el.parentElement.classList.toggle("set",!!v)};
   tileVal("durVal",cur?fmt(cur):"","tapToPick");
-  tileVal("startVal",$("startIn").value,"optional");
-  tileVal("rStartVal",$("rStart").value,"tapToPick");
-  tileVal("rEndVal",$("rEnd").value,"tapToPick");
+  tileVal("startVal",clockStr($("startIn").value),"optional");
+  tileVal("rStartVal",clockStr($("rStart").value),"tapToPick");
+  tileVal("rEndVal",clockStr($("rEnd").value),"tapToPick");
   const r=S.tmode==="range"?readTime():null;
   $("rangeSum").innerHTML=r&&r.min?`= <b>${fmt(r.min)}</b>${r.overnight?" · "+T("pvOvernight"):""}`:"";
   updatePreview();
@@ -674,7 +728,7 @@ function updatePreview(){
   const c=catInfo(S.cat),r=readTime();
   if(!r.min){el.className="preview";el.style.removeProperty("--c");el.innerHTML=(r.err?"⚠ ":"")+esc(r.hint);return}
   let pay=0;if(c.paid){const p=payFromInput(r.min,S.cat);if(isFinite(p))pay=p}
-  const when=r.start?`<span class="pvt">${r.start}–${fromMin(toMin(r.start)+r.min)}</span>`:"";
+  const when=r.start?`<span class="pvt">${clockStr(r.start)}–${clock(toMin(r.start)+r.min)}</span>`:"";
   const notes=[];
   if(r.auto)notes.push(T("pvJustNow"));
   if(r.overnight)notes.push(T("pvOvernight"));
@@ -693,7 +747,7 @@ function openWheel(o){
   const box=$("wheelCols");box.innerHTML="";
   wheel={cols:[],format:o.format,onDone:o.onDone};
   o.cols.forEach((c,ci)=>{
-    if(ci&&o.sep){const sp=document.createElement("div");sp.className="wsep";sp.textContent=o.sep;box.appendChild(sp)}
+    if(ci&&o.sep&&ci===(o.sepAt||1)){const sp=document.createElement("div");sp.className="wsep";sp.textContent=o.sep;box.appendChild(sp)}
     const col=document.createElement("div");col.className="wcol";
     col.innerHTML=`<button type="button" class="warr" data-wa="-1" aria-label="up">▲</button>
       <div class="wwrap"><div class="wband"></div><div class="wview" tabindex="0" role="listbox" aria-label="${esc(c.unit||"")}"><div class="wpad"></div>${c.labels.map((l,i)=>`<div class="witem" data-wi="${i}" role="option">${l}</div>`).join("")}<div class="wpad"></div></div></div>
@@ -708,7 +762,8 @@ function openWheel(o){
     entry.start=nearestIndex(c.values,c.value);
   });
   $("wheelTitle").textContent=o.title;
-  $("wheelExtra").innerHTML=(o.extra||[]).map((x,i)=>`<button type="button" class="ghost" data-wx="${i}">${esc(x.label)}</button>`).join("");
+  $("wheelExtra").innerHTML=(o.extra||[]).map((x,i)=>`<button type="button" class="ghost ${x.cls||""}" data-wx="${i}">${esc(x.label)}</button>`).join("");
+  $("wheelCols").classList.toggle("three",o.cols.length===3);
   wheel.extra=o.extra||[];
   const d=$("wheelDlg");try{d.showModal()}catch(e){d.setAttribute("open","")}
   requestAnimationFrame(()=>{wheel.cols.forEach(c=>{c.idx=c.start;c.view.scrollTop=c.idx*W_ITEM});markWheel();wheel.cols[0].view.focus({preventScroll:true})});
@@ -737,21 +792,30 @@ function pickDuration(){
     format:v=>fmt(v[0]*60+v[1])||"0",
     onDone:v=>{const m=v[0]*60+v[1];setDur(m)}});
 }
-// id = hidden input that holds "HH:MM"
+// id = hidden input that holds "HH:MM" (always 24 h inside); the wheel shows 24 h or 12 h + AM/PM
 function pickTime(id,titleKey,opt={}){
   const el=$(id);let cur=toMin(el.value);
   if(cur==null){
     if(id==="rEnd"&&toMin($("rStart").value)!=null)cur=(toMin($("rStart").value)+60)%1440;
     else cur=S.sel===todayStr()?nowMin("down"):(id==="rEnd"?17*60:9*60);
   }
+  const H12=[12,1,2,3,4,5,6,7,8,9,10,11];
+  const toVals=m=>S.clock12?[((Math.floor(m/60)%12)||12),m%60,Math.floor(m/60)<12?0:1]:[Math.floor(m/60),m%60];
+  const fromVals=v=>S.clock12?((v[0]%12)+(v[2]?12:0))*60+v[1]:v[0]*60+v[1];
   const extra=[];
-  if(S.sel===todayStr())extra.push({label:T("nowBtn"),fn:()=>{const m=nowMin();setWheel([Math.floor(m/60),m%60])}});
+  if(S.sel===todayStr())extra.push({label:T("nowBtn"),fn:()=>setWheel(toVals(nowMin()))});
   if(opt.clear&&el.value)extra.push({label:T("clearTime"),fn:()=>{el.value="";$("wheelDlg").close();renderTimeEntry();updatePayCalc()}});
-  openWheel({title:T(titleKey),sep:":",cols:[
-      {values:HOURS,labels:HOURS.map(pad),value:Math.floor(cur/60)},
-      {values:MINS5,labels:MINS5.map(pad),value:cur%60}],
-    format:v=>pad(v[0])+":"+pad(v[1]),extra,
-    onDone:v=>{el.value=pad(v[0])+":"+pad(v[1]);renderTimeEntry();updatePayCalc();if(opt.then)setTimeout(opt.then,250)}});
+  extra.push({label:S.clock12?T("use24"):T("use12"),cls:"fmtbtn",fn:()=>{const m=fromVals(wheelValues());S.clock12=!S.clock12;saveSettings();render();$("wheelDlg").close();setTimeout(()=>{pickTime(id,titleKey,{...opt,cur:m})},60)}});
+  if(opt.cur!=null)cur=opt.cur;
+  const cols=S.clock12?[
+      {values:H12,labels:H12.map(String),value:toVals(cur)[0]},
+      {values:MINS5,labels:MINS5.map(pad),value:cur%60},
+      {values:[0,1],labels:["AM","PM"],value:toVals(cur)[2]}]
+    :[{values:HOURS,labels:HOURS.map(pad),value:Math.floor(cur/60)},
+      {values:MINS5,labels:MINS5.map(pad),value:cur%60}];
+  openWheel({title:T(titleKey),sep:":",sepAt:1,cols,extra,
+    format:v=>clock(fromVals(v)),
+    onDone:v=>{el.value=fromMin(fromVals(v));renderTimeEntry();updatePayCalc();if(opt.then)setTimeout(opt.then,250)}});
 }
 
 // ---------- income ----------
@@ -832,7 +896,7 @@ function renderWeekDetail(){
   const placed=all.filter(e=>e.s!=null);
   let h0=0,h1=24;
   if(S.wdRange==="auto"){
-    if(placed.length){h0=Math.floor(Math.min(...placed.map(e=>e.s))/60);h1=Math.ceil(Math.min(1440,Math.max(...placed.map(e=>e.s+e.min)))/60);
+    if(placed.length){h0=Math.floor(Math.min(...placed.map(e=>e.s))/60);h1=Math.ceil(Math.min(1440,Math.max(...placed.map(e=>e.s+spanOf(e))))/60);
       if(h1-h0<6){const mid=(h0+h1)/2;h0=Math.max(0,Math.floor(mid-3));h1=Math.min(24,h0+6)}}
     else{h0=8;h1=22}
     if(days.includes(today)){const nh=new Date().getHours();h0=Math.min(h0,nh);h1=Math.max(h1,nh+1)}
@@ -844,10 +908,11 @@ function renderWeekDetail(){
   days.forEach((d,i)=>{
     let evs="";
     placed.filter(e=>e.di===i).forEach(e=>{
-      const a=Math.max(e.s,h0*60),b=Math.min(e.s+e.min,h1*60,1440);if(b<=a)return;
+      const a=Math.max(e.s,h0*60),b=Math.min(e.s+spanOf(e),h1*60,1440);if(b<=a)return;
       const top=(a-h0*60)/60*HH,ht=Math.max(4,(b-a)/60*HH-1),c=catInfo(e.cat);
-      const time=fromMin(e.s)+"–"+fromMin(e.s+e.min);
-      evs+=`<button type="button" class="ev" data-day="${d}" style="--c:var(${c.v});top:${top}px;height:${ht}px" title="${esc(c.name)} · ${time} · ${fmt(e.min)}${e.pay?" · "+fmtMoney(+e.pay,true):""}${e.note?" · "+esc(e.note):""}">${ht>=16?`<b>${esc(c.name)}</b>`:""}${ht>=30?`<span>${time}</span>`:""}</button>`;
+      const time=whenTxt(e);
+      const brks=(e.breaks||[]).map(x=>{const bs=Math.max(x.s,a),be=Math.min(x.s+x.m,b);return be>bs?`<i class="evbrk" style="top:${(bs-a)/60*HH}px;height:${Math.max(2,(be-bs)/60*HH)}px"></i>`:""}).join("");
+      evs+=`<button type="button" class="ev" data-day="${d}" style="--c:var(${c.v});top:${top}px;height:${ht}px" title="${esc(c.name)} · ${time} · ${fmt(e.min)}${breakTxt(e)?" · "+breakTxt(e):""}${e.pay?" · "+fmtMoney(+e.pay,true):""}${e.note?" · "+esc(e.note):""}">${ht>=16?`<b>${esc(c.name)}</b>`:""}${ht>=30?`<span>${time}</span>`:""}${brks}</button>`;
     });
     if(d===today){const n=new Date(),m=n.getHours()*60+n.getMinutes();if(m>=h0*60&&m<=h1*60)evs+=`<div class="nowl" style="top:${(m-h0*60)/60*HH}px"></div>`}
     html+=`<div class="dcol${d===today?" today":""}" style="height:${H}px;--hh:${HH}px">${evs}</div>`;
@@ -864,7 +929,7 @@ function renderWeekDetail(){
     rows+=`<tr class="dsep"><td colspan="5">${cap(fDay().format(parse(d)))} · ${T("dayTotal",{t:fmt(tot)})}${inc?` · <span class="pay">${fmtMoney(inc,true)}</span>`:""}</td></tr>`;
     (day(d).income||[]).forEach(x=>{rows+=`<tr><td class="mono">—</td><td>${T("income")}</td><td></td><td class="pay">${fmtMoney(+x.amount,true)}</td><td class="nt">${esc(x.src)}</td></tr>`});
     list.forEach(e=>{const c=catInfo(e.cat),s=toMin(e.start);
-      rows+=`<tr><td class="mono">${s!=null?fromMin(s)+"–"+fromMin(s+e.min):"—"}</td><td><span class="cc" style="--c:var(${c.v})"><span class="dot"></span>${esc(c.name)}</span></td><td class="mono">${fmt(e.min)}</td><td class="pay">${e.pay?fmtMoney(+e.pay,true):""}</td><td class="nt">${esc(e.note)}</td></tr>`});
+      rows+=`<tr><td class="mono">${s!=null?whenTxt(e):"—"}</td><td><span class="cc" style="--c:var(${c.v})"><span class="dot"></span>${esc(c.name)}</span></td><td class="mono">${fmt(e.min)}</td><td class="pay">${e.pay?fmtMoney(+e.pay,true):""}</td><td class="nt">${breakTxt(e)?`<span class="brk">${breakTxt(e)}</span> `:""}${esc(e.note)}</td></tr>`});
   });
   rows+="</tbody>";
   $("wt").innerHTML=all.length?rows:`<tbody><tr><td class="nt">${T("wdEmpty")}</td></tr></tbody>`;
@@ -886,7 +951,7 @@ function renderCatManager(){
         <label class="chk"><input type="checkbox" id="cpay-${c.k}" data-cpaid="${c.k}" ${ci.paid?"checked":""}><span>${T("paidLabel")}</span></label>
         <button class="small" data-coff="${c.k}">${c.off?T("show"):T("hide")}</button></div>`}).join("");
   }
-  $("ncSw").innerHTML=COLORS.map(col=>`<button type="button" class="sw" style="--c:var(--${col})" data-ncol="${col}" aria-pressed="${S.newColor===col}" aria-label="${col}"></button>`).join("");
+  $("ncSw").innerHTML=`<button type="button" class="colorbtn" id="ncColor"><span class="sw" style="--c:${colorCss(S.newColor)}"></span>${T("pickColor")}</button>`;
 }
 
 // ---------- events ----------
@@ -899,6 +964,7 @@ document.addEventListener("click",async ev=>{
   if(ds.tm){if(S.tmode!==ds.tm){S.tmode=ds.tm;try{localStorage.setItem("ps-tmode2",S.tmode)}catch(e){}renderTimeEntry();updatePayCalc()}return}
   if(ds.del){delEntry(S.sel,ds.del);return}
   if(ds.day){selectDay(ds.day);return}
+  if(ds.skin){const v=ds.skin==="classic"?"classic":"luxe";document.documentElement.dataset.skin=v;try{localStorage.setItem("ps-skin",v)}catch(e){}applyStatic();return}
   if(ds.pm){if(S.payMode!==ds.pm){S.payMode=ds.pm;$("payIn").value="";renderPay();renderTimer();saveSettings()}return}
   if(ds.wdr){S.wdRange=ds.wdr;renderWeekDetail();return}
   if(ds.mode){S.goalMode=ds.mode;render();saveSettings();return}
@@ -909,9 +975,12 @@ document.addEventListener("click",async ev=>{
     setDay(from,{tasks:day(from).tasks.filter(x=>x.id!==ds.mv)});setDay(to,{tasks:[...day(to).tasks,{...tk}]});
     render();await saveDay(from);await saveDay(to);return}
   if(ds.gclr){const k=ds.gclr;if(S.goalMode==="week")S.wgoals={...S.wgoals,[k]:0};else S.goals={...S.goals,[k]:0};render();saveSettings();showMsg(T("goalRemoved"));return}
-  if(ds.cyc){S.cats=S.cats.map(c=>c.k===ds.cyc?{...c,color:COLORS[(COLORS.indexOf(c.color)+1)%COLORS.length]}:c);render();saveSettings();return}
+  if(ds.cyc){const k=ds.cyc,cur=(S.cats.find(c=>c.k===k)||{}).color;openColors(cur,col=>{S.cats=S.cats.map(c=>c.k===k?{...c,color:col}:c);render();saveSettings()});return}
+  if(ds.pick){pickColor(ds.pick);return}
   if(ds.coff){S.cats=S.cats.map(c=>c.k===ds.coff?{...c,off:!c.off}:c);render();saveSettings();return}
-  if(ds.ncol){S.newColor=ds.ncol;renderCatManager();return}
+  if(b.id==="ncColor"){openColors(S.newColor,col=>{S.newColor=col;renderCatManager()});return}
+  if(b.id==="colClose"){$("colorDlg").close();return}
+  if(b.id==="colUse"){pickColor($("colCustom").value);return}
   switch(b.id){
     case "prev":selectDay(addDays(S.sel,-1));break;
     case "next":selectDay(addDays(S.sel,1));break;
@@ -960,7 +1029,7 @@ document.addEventListener("click",async ev=>{
         if(pay&&S.payMode==="rate"){const r=parseAmount($("payIn").value);if(S.payRates[S.cat]!==r){S.payRates={...S.payRates,[S.cat]:r};saveSettings()}}
       }
       await addEntry(S.cat,min,$("noteIn").value.trim(),S.sel,start,pay);
-      showMsg(T("added",{t:fmt(min),c:cn})+(start?T("addedAt",{s:start}):"")+(pay?" · "+fmtMoney(pay,true):""));
+      showMsg(T("added",{t:fmt(min),c:cn})+(start?T("addedAt",{s:clockStr(start)}):"")+(pay?" · "+fmtMoney(pay,true):""));
       $("noteIn").value="";$("startIn").value="";$("rStart").value="";$("rEnd").value="";S.dh=0;S.dm=0;renderTimeEntry();
       if(S.payMode!=="rate")$("payIn").value="";
       render();break;}
@@ -968,14 +1037,25 @@ document.addEventListener("click",async ev=>{
     case "startTile":pickTime("startIn","startedAtT",{clear:true});break;
     case "rStartTile":pickTime("rStart","rStartL",{then:()=>{if(!$("rEnd").value)pickTime("rEnd","rEndL")}});break;
     case "rEndTile":pickTime("rEnd","rEndL");break;
-    case "tStart":if(!S.cat)return;S.timer={cat:S.cat,start:Date.now()};render();saveSettings();break;
+    case "tStart":if(!S.cat)return;S.timer={cat:S.cat,start:Date.now(),pauses:[]};render();saveSettings();break;
+    case "tPause":{const tm=S.timer;if(!tm)return;const now=Date.now();
+      if(tm.pausedAt){S.timer={...tm,pauses:[...(tm.pauses||[]),{s:tm.pausedAt,e:now}],pausedAt:null}}
+      else S.timer={...tm,pausedAt:now};
+      renderTimer();saveSettings();break;}
     case "tStop":{
-      const tm=S.timer;if(!tm)return;const min=Math.round((Date.now()-tm.start)/60000);
+      const tm0=S.timer;if(!tm0)return;const now=Date.now();
+      const tm=tm0.pausedAt?{...tm0,pauses:[...(tm0.pauses||[]),{s:tm0.pausedAt,e:now}],pausedAt:null}:tm0;
+      const min=Math.round(activeMs(tm,now)/60000);
       let pay=0;const tp=$("tPay");
       if(tp&&tp.value.trim()&&min>=1){const v=parseAmount(tp.value);if(!isFinite(v)){showMsg(T("badAmount"),true);tp.focus();return}pay=S.payMode==="rate"?Math.round(v*min/60*100)/100:v;
         if(S.payMode==="rate"&&S.payRates[tm.cat]!==v)S.payRates={...S.payRates,[tm.cat]:v}}
       S.timer=null;timerPayDraft="";const st=new Date(tm.start);
-      if(min>=1){await addEntry(tm.cat,min,"",toStr(st),pad(st.getHours())+":"+pad(st.getMinutes()),pay);showMsg(T("timerAdded",{t:fmt(min),c:catInfo(tm.cat).name})+(pay?" · "+fmtMoney(pay,true):""))}
+      if(min>=1){
+        // keep the pauses so the week grid can show them; minutes of day, relative to the start day
+        const s0=st.getHours()*60+st.getMinutes(),dayStart=new Date(st.getFullYear(),st.getMonth(),st.getDate()).getTime();
+        const breaks=(tm.pauses||[]).filter(x=>x.e-x.s>=30e3).map(x=>({s:Math.round((x.s-dayStart)/60000),m:Math.max(1,Math.round((x.e-x.s)/60000))}));
+        const span=Math.round((now-tm.start)/60000);
+        await addEntry(tm.cat,min,"",toStr(st),pad(st.getHours())+":"+pad(st.getMinutes()),pay,breaks.length&&span>min?{span,breaks}:null);showMsg(T("timerAdded",{t:fmt(min),c:catInfo(tm.cat).name})+(pay?" · "+fmtMoney(pay,true):""))}
       else showMsg(T("timerShort"));
       render();saveSettings();break;}
     case "tCancel":S.timer=null;timerPayDraft="";render();saveSettings();break;

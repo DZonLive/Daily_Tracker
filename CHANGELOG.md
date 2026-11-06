@@ -3,6 +3,14 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.15.0 (beta) — 2026-11-06
+- New "Luxe" look (porcelain, ink and brass; graphite and champagne in dark mode). The previous look stays available: footer → Look → Classic
+- Update banner now appears while the app is open (checks every 5 minutes and when you return to the app) and no longer shows after a reload that already has the new version
+- Time wheel: switch between 24 h and 12 h (AM/PM) right in the picker; times everywhere follow the choice
+- Timer: Pause / Resume. Breaks are kept with the entry and shown as hatched gaps in the week grid and as "break …" in the log and table
+- Category colors: palette with main colors, extra colors and any custom color
+- Backup of the previous version: branch backup/v0.14.0-classic
+
 ## 0.14.0 (beta) — 2026-11-06
 - "From – to" is now the first and default way to log time
 - × button to remove a goal (category goals and the monthly income goal)

@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Productivity Starter</title>
 <meta name="description" content="Time journal: track study, work, workouts and rest, plan tasks and keep a streak.">
-<meta name="theme-color" content="#f3f4f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#12141a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3f1ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0f11" media="(prefers-color-scheme: dark)">
+<script>/* look: "luxe" (default) or "classic"; set before the page paints */try{document.documentElement.dataset.skin=localStorage.getItem("ps-skin")||"luxe"}catch(e){document.documentElement.dataset.skin="luxe"}</script>
 <link rel="stylesheet" href="styles.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -16,7 +17,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Productivity">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Bodoni+Moda:opsz,wght@6..96,400..700&family=Manrope:wght@400;500;600;700&display=swap">
 </head>
 <body>
 
@@ -229,7 +230,12 @@
   </section>
 </div>
 
-<footer class="foot"><span id="footVer"></span> · <a href="https://github.com/DZonLive/Daily_Tracker" target="_blank" rel="noopener">GitHub</a></footer>
+<footer class="foot">
+  <div class="skinsw" role="group"><span data-t="lookLabel"></span>
+    <div class="mode"><button type="button" data-skin="luxe" id="skin-luxe" data-t="lookLuxe"></button><button type="button" data-skin="classic" id="skin-classic" data-t="lookClassic"></button></div>
+  </div>
+  <div><span id="footVer"></span> · <a href="https://github.com/DZonLive/Daily_Tracker" target="_blank" rel="noopener">GitHub</a></div>
+</footer>
 
 <div class="updatebar" id="updateBar" hidden role="status">
   <span data-t="updateText"></span>
@@ -296,6 +302,18 @@
     </div>
     <div class="wcols" id="wheelCols"></div>
     <div class="wextra" id="wheelExtra"></div>
+  </div>
+</dialog>
+
+<dialog id="colorDlg" class="sheet" aria-labelledby="colTitle">
+  <div class="dlg">
+    <div class="dlg-head"><h2 id="colTitle" data-t="colorsTitle"></h2><button class="del" id="colClose" data-ta="close">×</button></div>
+    <div class="label" data-t="colorsMain"></div>
+    <div class="swatches" id="colPresets"></div>
+    <div class="label" data-t="colorsMore"></div>
+    <div class="swatches" id="colExtra"></div>
+    <div class="label" data-t="colorsCustom"></div>
+    <div class="row customcol"><input type="color" id="colCustom" aria-label="color"><button class="primary" id="colUse" data-t="useColor"></button></div>
   </div>
 </dialog>
 
