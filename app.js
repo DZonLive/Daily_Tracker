@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.15.0";
+const APP_VERSION="0.15.1";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -53,6 +53,8 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  use12:"12 h (AM/PM)",use24:"24 h",timeFmt:"Time format",pause:"Pause",resume:"Resume",onPause:"Paused",pausesN:"breaks: {n} ({t})",pausedFor:"break {t}",
  pickColor:"Choose color",colorsTitle:"Color",colorsMain:"Main",colorsMore:"More colors",colorsCustom:"Your own color",useColor:"Use",
  lookLabel:"Look",lookLuxe:"Luxe",lookClassic:"Classic",
+ deleteCat:"Delete category",deleteQ:"Delete?",catDeleted:"Deleted “{c}”. Its past entries stay in your history.",lastCat:"You need at least one category.",
+ editEntry:"Edit",deleteEntry:"Delete",saveChanges:"Save changes",editing:"Editing an entry",editMove:"Will move the entry to {d}",entrySaved:"Changes saved",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -115,6 +117,8 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  use12:"12 ч (AM/PM)",use24:"24 ч",timeFmt:"Формат времени",pause:"Пауза",resume:"Продолжить",onPause:"На паузе",pausesN:"пауз: {n} ({t})",pausedFor:"пауза {t}",
  pickColor:"Выбрать цвет",colorsTitle:"Цвет",colorsMain:"Основные",colorsMore:"Ещё цвета",colorsCustom:"Свой цвет",useColor:"Выбрать",
  lookLabel:"Оформление",lookLuxe:"Люкс",lookClassic:"Классика",
+ deleteCat:"Удалить категорию",deleteQ:"Удалить?",catDeleted:"Категория «{c}» удалена. Её прошлые записи останутся в истории.",lastCat:"Нужна хотя бы одна категория.",
+ editEntry:"Изменить",deleteEntry:"Удалить",saveChanges:"Сохранить изменения",editing:"Редактирование записи",editMove:"Запись переместится на {d}",entrySaved:"Изменения сохранены",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -550,13 +554,14 @@ function render(){
   renderTimeEntry();
   renderTimer();
   renderPay();
+  renderEditBar();
 
   // journal
   const list=sortedEntries(sel);
   $("logCount").textContent=list.length?list.length+" "+I18N[LANG].entries(list.length):"";
   $("log").innerHTML=list.length?list.map(e=>{const c=catInfo(e.cat);const s=toMin(e.start);
     const when=s!=null?whenTxt(e):T("noTime");
-    return `<li style="--c:var(${c.v})"><span class="when">${when}</span><span class="dot"></span><span class="k">${esc(c.name)}</span><span class="t">${fmt(e.min)}</span><span class="n">${breakTxt(e)?`<span class="brk">${breakTxt(e)}</span> `:""}${e.pay?`<span class="pay">${fmtMoney(+e.pay,true)}</span> `:""}${esc(e.note)}</span><button class="del" data-del="${e.id}" aria-label="×">×</button></li>`}).join("")
+    return `<li style="--c:var(${c.v})"><span class="when">${when}</span><span class="dot"></span><span class="k">${esc(c.name)}</span><span class="t">${fmt(e.min)}</span><span class="n">${breakTxt(e)?`<span class="brk">${breakTxt(e)}</span> `:""}${e.pay?`<span class="pay">${fmtMoney(+e.pay,true)}</span> `:""}${esc(e.note)}</span><span class="acts"><button class="editbtn" data-edit="${e.id}" aria-label="${T("editEntry")}" title="${T("editEntry")}">✎</button><button class="del red" data-del="${e.id}" aria-label="${T("deleteEntry")}" title="${T("deleteEntry")}">×</button></span></li>`}).join("")
     :`<li class="empty">${T("emptyLog")}</li>`;
 
   renderWeek();
@@ -594,7 +599,7 @@ function renderPlan(){
   const d=day(S.sel);
   const done=d.tasks.filter(x=>x.done).length;
   $("taskProg").textContent=d.tasks.length?done+"/"+d.tasks.length:"";
-  $("tasks").innerHTML=d.tasks.length?d.tasks.map(x=>`<li class="${x.done?"ok":""}"><input type="checkbox" id="tk-${x.id}" data-tk="${x.id}" ${x.done?"checked":""}><label class="tx" for="tk-${x.id}">${esc(x.text)}</label>${x.done?"<span></span>":`<button class="mv" data-mv="${x.id}">${T("toTomorrow")}</button>`}<button class="del" data-tdel="${x.id}" aria-label="×">×</button></li>`).join("")
+  $("tasks").innerHTML=d.tasks.length?d.tasks.map(x=>`<li class="${x.done?"ok":""}"><input type="checkbox" id="tk-${x.id}" data-tk="${x.id}" ${x.done?"checked":""}><label class="tx" for="tk-${x.id}">${esc(x.text)}</label>${x.done?"<span></span>":`<button class="mv" data-mv="${x.id}">${T("toTomorrow")}</button>`}<button class="del red" data-tdel="${x.id}" aria-label="×">×</button></li>`).join("")
     :`<li class="empty">${T("noTasks")}</li>`;
   const ta=$("noteArea");if(document.activeElement!==ta&&ta.value!==d.note)ta.value=d.note;
   if(!noteDirty)$("noteSaved").textContent="";
@@ -736,6 +741,30 @@ function updatePreview(){
   const dayTxt=S.sel===todayStr()?T("today").toLowerCase():fD().format(parse(S.sel));
   el.className="preview ok";el.style.setProperty("--c",`var(${c.v})`);
   el.innerHTML=`<span class="dot"></span><b>${esc(c.name)}</b>${when?" · "+when:""} · <span class="pvt">${fmt(r.min)}</span>${pay?` · <span class="pay">${fmtMoney(pay,true)}</span>`:""} · ${esc(dayTxt)}${notes.length?`<span class="pvs">${notes.join(" · ")}</span>`:""}`;
+}
+
+// ---------- edit an existing entry ----------
+// ✎ in the day log loads the entry into the "Log time" form; "Save changes" replaces it.
+// Picking another day in the calendar while editing moves the entry to that day.
+function startEdit(id){
+  const e=day(S.sel).entries.find(x=>x.id===id);if(!e)return;
+  S.edit={id,date:S.sel,breaks:e.breaks||null,span:e.span||null,start0:e.start||null,min0:e.min};
+  if(S.cats.some(c=>c.k===e.cat))S.cat=e.cat;
+  if(e.start){S.tmode="range";$("rStart").value=e.start;$("rEnd").value=fromMin(toMin(e.start)+spanOf(e));$("startIn").value=""}
+  else{S.tmode="dur";S.dh=Math.floor(e.min/60);S.dm=e.min%60;$("startIn").value="";$("rStart").value="";$("rEnd").value=""}
+  S.payMode="sum";$("payIn").value=e.pay?String(e.pay):"";
+  $("noteIn").value=e.note||"";
+  render();
+  $("addH").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+}
+function cancelEdit(){
+  S.edit=null;$("noteIn").value="";$("startIn").value="";$("rStart").value="";$("rEnd").value="";$("payIn").value="";S.dh=0;S.dm=0;render();
+}
+function renderEditBar(){
+  const on=!!S.edit;$("editBar").hidden=!on;
+  $("addBtn").textContent=on?T("saveChanges"):T("add");
+  if(on){const moved=S.edit.date!==S.sel;$("editTxt").textContent=moved?T("editMove",{d:fD().format(parse(S.sel))}):T("editing")}
+  $("addH").closest("section").classList.toggle("editing",on);
 }
 
 // ---------- wheel picker ----------
@@ -881,7 +910,7 @@ function renderIncome(){
   $("incHow").innerHTML=T("incHow",{c:paidNames});
   const legacy=day(sel).income||[];
   $("incLegacy").hidden=!legacy.length;
-  $("incList").innerHTML=legacy.map(x=>`<li><span class="amt">${fmtMoney(+x.amount,true)}</span><span class="tx">${esc(x.src)}</span><button class="del" data-idel="${x.id}" aria-label="×">×</button></li>`).join("");
+  $("incList").innerHTML=legacy.map(x=>`<li><span class="amt">${fmtMoney(+x.amount,true)}</span><span class="tx">${esc(x.src)}</span><button class="del red" data-idel="${x.id}" aria-label="×">×</button></li>`).join("");
   const gi=$("incGoal");if(document.activeElement!==gi)gi.value=g||"";
   $("incGoalClr").hidden=!g;
   // day summary line
@@ -935,6 +964,7 @@ function renderWeekDetail(){
   $("wt").innerHTML=all.length?rows:`<tbody><tr><td class="nt">${T("wdEmpty")}</td></tr></tbody>`;
 }
 
+let catDelAsk=null; // key of the category waiting for "Delete?" confirmation
 function renderCatManager(){
   const smi=$("streakMin");if(document.activeElement!==smi)smi.value=+(S.streakMin/60).toFixed(2);
   const weekly=S.goalMode==="week";
@@ -946,10 +976,11 @@ function renderCatManager(){
       return `<div class="catrow${c.off?" off":""}" style="--c:var(${ci.v})">
         <button class="sw" data-cyc="${c.k}" aria-label="${T("colorBtn")}"></button>
         <input type="text" id="cn-${c.k}" data-cname="${c.k}" value="${esc(ci.name)}" maxlength="24" aria-label="${esc(ci.name)}">
-        <label class="gl"><input type="number" min="0" step="${weekly?0.5:0.25}" id="cg-${c.k}" data-goal="${c.k}" value="${+(v/60).toFixed(2)}" class="mono"><span>${T(weekly?"hPerWeek":"mPerDay")}</span>${v?`<button type="button" class="goalclr" data-gclr="${c.k}" aria-label="${T("removeGoal")}">×</button>`:""}</label>
+        <div class="catopts"><label class="gl"><input type="number" min="0" step="${weekly?0.5:0.25}" id="cg-${c.k}" data-goal="${c.k}" value="${v?+(v/60).toFixed(2):""}" placeholder="—" class="mono nospin" inputmode="decimal"><span>${T(weekly?"hPerWeek":"mPerDay")}</span></label>
         <label class="chk"><input type="checkbox" id="cp-${c.k}" data-cprod="${c.k}" ${c.prod?"checked":""}><span>${T("prodLabel")}</span></label>
         <label class="chk"><input type="checkbox" id="cpay-${c.k}" data-cpaid="${c.k}" ${ci.paid?"checked":""}><span>${T("paidLabel")}</span></label>
-        <button class="small" data-coff="${c.k}">${c.off?T("show"):T("hide")}</button></div>`}).join("");
+        <button class="small" data-coff="${c.k}">${c.off?T("show"):T("hide")}</button></div>
+        ${catDelAsk===c.k?`<button class="delask" data-cdel="${c.k}">${T("deleteQ")}</button>`:`<button class="del red" data-cdelask="${c.k}" aria-label="${T("deleteCat")}" title="${T("deleteCat")}">×</button>`}</div>`}).join("");
   }
   $("ncSw").innerHTML=`<button type="button" class="colorbtn" id="ncColor"><span class="sw" style="--c:${colorCss(S.newColor)}"></span>${T("pickColor")}</button>`;
 }
@@ -962,7 +993,8 @@ document.addEventListener("click",async ev=>{
   if(ds.cat){if(S.cat!==ds.cat){S.cat=ds.cat;$("payIn").value=S.payMode==="rate"&&S.payRates[ds.cat]?S.payRates[ds.cat]:""}render();return}
   if(ds.dur){setDur(+ds.dur);return}
   if(ds.tm){if(S.tmode!==ds.tm){S.tmode=ds.tm;try{localStorage.setItem("ps-tmode2",S.tmode)}catch(e){}renderTimeEntry();updatePayCalc()}return}
-  if(ds.del){delEntry(S.sel,ds.del);return}
+  if(ds.del){if(S.edit&&S.edit.id===ds.del)cancelEdit();delEntry(S.sel,ds.del);return}
+  if(ds.edit){startEdit(ds.edit);return}
   if(ds.day){selectDay(ds.day);return}
   if(ds.skin){const v=ds.skin==="classic"?"classic":"luxe";document.documentElement.dataset.skin=v;try{localStorage.setItem("ps-skin",v)}catch(e){}applyStatic();return}
   if(ds.pm){if(S.payMode!==ds.pm){S.payMode=ds.pm;$("payIn").value="";renderPay();renderTimer();saveSettings()}return}
@@ -974,6 +1006,15 @@ document.addEventListener("click",async ev=>{
     const from=S.sel,to=addDays(from,1);const tk=day(from).tasks.find(x=>x.id===ds.mv);if(!tk)return;
     setDay(from,{tasks:day(from).tasks.filter(x=>x.id!==ds.mv)});setDay(to,{tasks:[...day(to).tasks,{...tk}]});
     render();await saveDay(from);await saveDay(to);return}
+  if(ds.cdelask){catDelAsk=ds.cdelask;renderCatManager();setTimeout(()=>{if(catDelAsk===ds.cdelask){catDelAsk=null;renderCatManager()}},4000);return}
+  if(ds.cdel){
+    const k=ds.cdel;catDelAsk=null;
+    if(S.cats.length<=1){showMsg(T("lastCat"),true);renderCatManager();return}
+    const name=catInfo(k).name;
+    S.cats=S.cats.filter(c=>c.k!==k);
+    const g={...S.goals},w={...S.wgoals};delete g[k];delete w[k];S.goals=g;S.wgoals=w;
+    if(S.cat===k)S.cat=(S.cats.find(c=>!c.off)||S.cats[0]).k;
+    render();saveSettings();showCatMsg(T("catDeleted",{c:name}));return}
   if(ds.gclr){const k=ds.gclr;if(S.goalMode==="week")S.wgoals={...S.wgoals,[k]:0};else S.goals={...S.goals,[k]:0};render();saveSettings();showMsg(T("goalRemoved"));return}
   if(ds.cyc){const k=ds.cyc,cur=(S.cats.find(c=>c.k===k)||{}).color;openColors(cur,col=>{S.cats=S.cats.map(c=>c.k===k?{...c,color:col}:c);render();saveSettings()});return}
   if(ds.pick){pickColor(ds.pick);return}
@@ -1028,11 +1069,27 @@ document.addEventListener("click",async ev=>{
         if(!isFinite(pay)){showMsg(T("badAmount"),true);$("payIn").focus();return}
         if(pay&&S.payMode==="rate"){const r=parseAmount($("payIn").value);if(S.payRates[S.cat]!==r){S.payRates={...S.payRates,[S.cat]:r};saveSettings()}}
       }
-      await addEntry(S.cat,min,$("noteIn").value.trim(),S.sel,start,pay);
-      showMsg(T("added",{t:fmt(min),c:cn})+(start?T("addedAt",{s:clockStr(start)}):"")+(pay?" · "+fmtMoney(pay,true):""));
+      if(S.edit){
+        const ed=S.edit,old=day(ed.date).entries.find(x=>x.id===ed.id);
+        const e={...(old||{}),id:ed.id,cat:S.cat,min:Math.round(min),note:$("noteIn").value.trim()};
+        if(start)e.start=start;else delete e.start;
+        if(pay>0)e.pay=pay;else delete e.pay;
+        // keep timer breaks only if the times were not changed
+        const same=ed.breaks&&start===ed.start0&&S.tmode==="range"&&min===(ed.span||min);
+        if(same){e.min=ed.min0;e.span=ed.span;e.breaks=ed.breaks}else{delete e.span;delete e.breaks}
+        setDay(ed.date,{entries:day(ed.date).entries.filter(x=>x.id!==ed.id)});
+        setDay(S.sel,{entries:[...day(S.sel).entries,e]});
+        const moved=ed.date!==S.sel;S.edit=null;render();
+        await saveDay(S.sel);if(moved)await saveDay(ed.date);
+        showMsg(T("entrySaved"));
+      }else{
+        await addEntry(S.cat,min,$("noteIn").value.trim(),S.sel,start,pay);
+        showMsg(T("added",{t:fmt(min),c:cn})+(start?T("addedAt",{s:clockStr(start)}):"")+(pay?" · "+fmtMoney(pay,true):""));
+      }
       $("noteIn").value="";$("startIn").value="";$("rStart").value="";$("rEnd").value="";S.dh=0;S.dm=0;renderTimeEntry();
       if(S.payMode!=="rate")$("payIn").value="";
       render();break;}
+    case "editCancel":cancelEdit();break;
     case "durTile":pickDuration();break;
     case "startTile":pickTime("startIn","startedAtT",{clear:true});break;
     case "rStartTile":pickTime("rStart","rStartL",{then:()=>{if(!$("rEnd").value)pickTime("rEnd","rEndL")}});break;

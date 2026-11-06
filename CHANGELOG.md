@@ -3,6 +3,11 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.15.1 (beta) — 2026-11-06
+- Categories can be deleted (red × at the right end of the row, then "Delete?"). Past entries stay in history.
+- Day log: ✎ edits an entry in the "Log time" form (pick another day while editing to move it); × is red and at the far right
+- Fix: goal hour fields no longer have browser arrows covering the number; category rows no longer wrap
+
 ## 0.15.0 (beta) — 2026-11-06
 - New "Luxe" look (porcelain, ink and brass; graphite and champagne in dark mode). The previous look stays available: footer → Look → Classic
 - Update banner now appears while the app is open (checks every 5 minutes and when you return to the app) and no longer shows after a reload that already has the new version
