@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.15.2";
+const APP_VERSION="0.16.0";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -57,6 +57,8 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  editEntry:"Edit",deleteEntry:"Delete",saveChanges:"Save changes",editing:"Editing an entry",editMove:"Will move the entry to {d}",entrySaved:"Changes saved",
  catHelp:"Productive: counts toward the streak and the “Productive” share. Paid work: when you log time in it, you can add what you earned.",
  askPay:"How much did you earn for this?",askPayHint:"Leave empty or tap “No earnings” if this time wasn't paid.",savePay:"Save",noPay:"No earnings",backToTimer:"Back to timer",stopped:"Stopped",entryDeleted:"Entry deleted",
+ menu:"Menu",back:"Back",detailsBtn:"Details",menuCats:"Categories & goals",menuCatsSub:"View and add categories, set goals",menuIncomeSub:"Month total, goal, earnings per hour",
+ menuWeekSub:"Hour grid and table, edit entries",menuSettings:"Settings",menuSettingsSub:"Language, look, time format, streak",setLang:"Language",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -123,6 +125,8 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  editEntry:"Изменить",deleteEntry:"Удалить",saveChanges:"Сохранить изменения",editing:"Редактирование записи",editMove:"Запись переместится на {d}",entrySaved:"Изменения сохранены",
  catHelp:"Продуктивное — время идёт в streak и в долю «Продуктивно». Оплачиваемая — при записи времени можно указать, сколько заработал.",
  askPay:"Сколько заработал за это время?",askPayHint:"Оставь пустым или нажми «Без заработка», если за это время не платили.",savePay:"Сохранить",noPay:"Без заработка",backToTimer:"Вернуться к таймеру",stopped:"Остановлен",entryDeleted:"Запись удалена",
+ menu:"Меню",back:"Назад",detailsBtn:"Подробно",menuCats:"Категории и цели",menuCatsSub:"Просмотр и добавление категорий, цели",menuIncomeSub:"Итог за месяц, цель, заработок в час",
+ menuWeekSub:"Сетка по часам и таблица, правка записей",menuSettings:"Настройки",menuSettingsSub:"Язык, оформление, формат времени, streak",setLang:"Язык",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -512,6 +516,8 @@ function applyStatic(){
   const sk=document.documentElement.dataset.skin||"luxe";$("skin-luxe").setAttribute("aria-pressed",sk==="luxe");$("skin-classic").setAttribute("aria-pressed",sk==="classic");
   $("lang-en").setAttribute("aria-pressed",LANG==="en");$("lang-ru").setAttribute("aria-pressed",LANG==="ru");
   $("status").textContent=T(statusKey,statusVar);
+  $("clk-24").setAttribute("aria-pressed",!S.clock12);$("clk-12").setAttribute("aria-pressed",!!S.clock12);
+  $("drawerVer").textContent="v"+APP_VERSION+" beta";
   $("verBadge").textContent="Beta · v"+APP_VERSION;$("footVer").textContent="Productivity Starter v"+APP_VERSION+" beta";
   if(typeof renderAccount==="function"&&$("acctBtn"))renderAccount();
 }
@@ -754,6 +760,35 @@ function updatePreview(){
   el.className="preview ok";el.style.setProperty("--c",`var(${c.v})`);
   el.innerHTML=`<span class="dot"></span><b>${esc(c.name)}</b>${when?" · "+when:""} · <span class="pvt">${fmt(r.min)}</span>${pay?` · <span class="pay">${fmtMoney(pay,true)}</span>`:""} · ${esc(dayTxt)}${notes.length?`<span class="pvs">${notes.join(" · ")}</span>`:""}`;
 }
+
+// ---------- menu and pages ----------
+// ☰ opens a side menu; its items open full pages (categories, income, week in detail, settings).
+// Each open window adds a browser history step, so the phone's Back gesture closes it instead of leaving the app.
+const PAGES=["drawer","pg-cats","pg-income","pg-week","pg-settings"];
+let popping=false;
+function openPage(id){
+  const d=$(id);if(!d||d.open)return;
+  let replace=false;
+  if(id!=="drawer"&&$("drawer").open){$("drawer").dataset.silent="1";$("drawer").close();replace=true}
+  try{d.showModal()}catch(e){d.setAttribute("open","")}
+  d.scrollTop=0;const body=d.querySelector(".pagebody");if(body)body.scrollTop=0;
+  try{replace?history.replaceState({ps:id},""):history.pushState({ps:id},"")}catch(e){}
+}
+function closePage(id){const d=$(id);if(d&&d.open)d.close()}
+PAGES.forEach(id=>{
+  const d=$(id);if(!d)return;
+  d.addEventListener("close",()=>{
+    if(d.dataset.silent){delete d.dataset.silent;return}
+    if(!popping&&history.state&&history.state.ps===id){try{history.back()}catch(e){}}
+  });
+  d.addEventListener("click",e=>{if(e.target===d)d.close()}); // tap outside
+});
+window.addEventListener("popstate",()=>{
+  popping=true;
+  const open=PAGES.filter(id=>$(id)&&$(id).open);
+  open.forEach(id=>$(id).close());
+  popping=false;
+});
 
 // ---------- edit an existing entry ----------
 // ✎ in the day log loads the entry into the "Log time" form; "Save changes" replaces it.
@@ -1022,13 +1057,18 @@ function renderCatManager(){
 document.addEventListener("click",async ev=>{
   const b=ev.target.closest("button");if(!b)return;
   const ds=b.dataset;
+  if(ds.open){openPage(ds.open);return}
+  if(b.hasAttribute("data-close")){const d=b.closest("dialog");if(d)d.close();return}
+  if(ds.act==="acct"){closePage("drawer");setTimeout(()=>$("acctBtn").click(),60);return}
+  if(ds.clock){const v=ds.clock==="12";if(S.clock12!==v){S.clock12=v;render();saveSettings()}return}
+  if((b.id==="installBtn"||b.id==="shareBtn")&&$("drawer").open)closePage("drawer");
   if(ds.lang){if(ds.lang!==LANG){LANG=ds.lang;try{localStorage.setItem("ps-lang",LANG)}catch(e){}render();saveSettings()}return}
   if(ds.cat){if(S.cat!==ds.cat){S.cat=ds.cat;$("payIn").value=S.payMode==="rate"&&S.payRates[ds.cat]?S.payRates[ds.cat]:""}render();return}
   if(ds.dur){setDur(+ds.dur);return}
   if(ds.tm){if(S.tmode!==ds.tm){S.tmode=ds.tm;try{localStorage.setItem("ps-tmode2",S.tmode)}catch(e){}renderTimeEntry();updatePayCalc()}return}
   if(ds.del){if(S.edit&&S.edit.id===ds.del)cancelEdit();delEntry(S.sel,ds.del);return}
   if(ds.edit){startEdit(ds.edit);return}
-  if(ds.wedit){const [d,id]=ds.wedit.split("|");selectDay(d);startEdit(id);return}
+  if(ds.wedit){const [d,id]=ds.wedit.split("|");closePage("pg-week");selectDay(d);setTimeout(()=>startEdit(id),60);return}
   if(ds.wdel){const [d,id]=ds.wdel.split("|");if(S.edit&&S.edit.id===id)cancelEdit();setDay(d,{entries:day(d).entries.filter(x=>x.id!==id)});render();saveDay(d);showMsg(T("entryDeleted"));return}
   if(ds.wdeli){const [d,id]=ds.wdeli.split("|");setDay(d,{income:(day(d).income||[]).filter(x=>x.id!==id)});render();saveDay(d);return}
   if(ds.day){selectDay(ds.day);return}
@@ -1067,7 +1107,7 @@ document.addEventListener("click",async ev=>{
     case "wNext":selectDay(addDays(S.sel,7));break;
     case "mPrev":S.month=addMonths(S.month,-1);renderCalendar();renderIncome();break;
     case "mNext":S.month=addMonths(S.month,1);renderCalendar();renderIncome();break;
-    case "goNewCat":$("catsPanel").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});setTimeout(()=>$("ncName").focus({preventScroll:true}),300);break;
+    case "goNewCat":openPage("pg-cats");setTimeout(()=>$("ncName").focus(),320);break;
     case "ncAdd":{
       const name=$("ncName").value.trim();
       if(!name){showCatMsg(T("catNeedName"));return}

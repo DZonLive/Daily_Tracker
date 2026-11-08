@@ -3,6 +3,14 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.16.0 (beta) — 2026-11-08
+- Shorter main page: ☰ menu (top left) with Categories & goals, Income, Week in detail and Settings as separate pages
+- Week panel has a "Details" button that opens the hour grid and table
+- Settings page: language, look, time format (24 h / 12 h), streak threshold
+- Install, Share and Account moved into the menu
+- Phone Back gesture closes the menu or page instead of leaving the app
+- No changes to how data is stored. Previous version: branch backup/v0.15.2
+
 ## 0.15.2 (beta) — 2026-11-06
 - Timer: for paid categories the earnings question appears after Stop ("Save" / "No earnings" / "Back to timer"), not while it runs; time spent answering doesn't count
 - Fix: timer sessions under a minute are no longer saved (30–59 s used to round up to 1 min)

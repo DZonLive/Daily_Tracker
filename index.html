@@ -23,9 +23,12 @@
 
 <div class="wrap">
   <header class="top">
-    <div>
+    <div class="brand">
+      <button class="iconbtn menubtn" id="menuBtn" type="button" data-open="drawer" data-ta="menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <div>
       <div class="titlerow"><h1>Productivity Starter</h1><span class="beta" id="verBadge">Beta</span></div>
       <div class="sub" data-t="sub"></div>
+      </div>
     </div>
     <div class="hdr-r">
       <div class="daynav">
@@ -34,13 +37,10 @@
         <button class="iconbtn" id="next" data-ta="nextDay">›</button>
         <button class="chipbtn" id="today" data-t="today"></button>
       </div>
-      <button class="installbtn" id="installBtn" type="button"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lbl-long" data-t="install"></span><span class="lbl-short" data-t="installShort"></span></button>
-      <button class="iconbtn sharebtn" id="shareBtn" type="button" data-ta="share"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+
       <button class="acctbtn" id="acctBtn" type="button">…</button>
-      <div class="lang" role="group" aria-label="Language">
-        <button type="button" data-lang="en" id="lang-en">EN</button>
-        <button type="button" data-lang="ru" id="lang-ru">RU</button>
-      </div>
+
     </div>
   </header>
 
@@ -142,62 +142,16 @@
   </section>
 
   <section class="panel" aria-labelledby="wkH">
-    <div class="panel-head"><h2 id="wkH" data-t="week"></h2><span class="hint" id="wkRange"></span></div>
+    <div class="panel-head"><h2 id="wkH" data-t="week"></h2><span class="wkhead"><span class="hint" id="wkRange"></span><button type="button" class="chipbtn detailsbtn" data-open="pg-week"><span data-t="detailsBtn"></span> ›</button></span></div>
     <div class="week">
       <div class="chart" id="chart"></div>
       <div class="wk-tot" id="wkTot"></div>
     </div>
   </section>
 
-  <section class="panel" aria-labelledby="wdH">
-    <div class="panel-head"><h2 id="wdH" data-t="weekDetail"></h2>
-      <div class="wdtools">
-        <button class="iconbtn" id="wPrev" data-ta="prevWeek">‹</button>
-        <span class="hint mono" id="wdRange" style="min-width:150px;text-align:center"></span>
-        <button class="iconbtn" id="wNext" data-ta="nextWeek">›</button>
-        <div class="mode" role="group">
-          <button type="button" data-wdr="auto" id="wdr-auto" data-t="rangeAuto"></button>
-          <button type="button" data-wdr="full" id="wdr-full">0–24</button>
-        </div>
-      </div>
-    </div>
-    <div class="wdscroll"><div class="wd" id="wd"></div></div>
-    <div class="wdnote" id="wdnote"></div>
-    <details class="wtable" id="wtable">
-      <summary data-t="showTable"></summary>
-      <div class="tblwrap"><table class="wt" id="wt"></table></div>
-    </details>
-  </section>
 
-  <section class="panel" id="incomePanel" aria-labelledby="incH">
-    <div class="panel-head"><h2 id="incH" data-t="income"></h2>
-      <div class="wdtools">
-        <button class="iconbtn" id="iPrev" data-ta="prevMonth">‹</button>
-        <span class="hint mono" id="incMonth" style="min-width:130px;text-align:center"></span>
-        <button class="iconbtn" id="iNext" data-ta="nextMonth">›</button>
-      </div>
-    </div>
-    <div class="inc-top">
-      <div class="inc-big">
-        <div class="label" data-t="incMonthTotal"></div>
-        <div class="big mono" id="incMonthTotal">$0</div>
-        <div id="incGoalBox"></div>
-      </div>
-      <div class="inc-stats" id="incStats"></div>
-    </div>
-    <div class="mchart" id="mchart"></div>
-    <p class="hint inc-how" id="incHow"></p>
-    <div class="inc-legacy" id="incLegacy" hidden>
-      <h3><span data-t="legacyTitle"></span></h3>
-      <ul class="tasks inclist" id="incList"></ul>
-    </div>
-    <div class="streakset">
-      <label for="incGoal" data-t="incGoal"></label>
-      <label class="money small-money"><span>$</span><input type="number" id="incGoal" min="0" step="50" class="mono"></label>
-      <button type="button" class="goalclr" id="incGoalClr" data-ta="removeGoal" hidden>×</button>
-      <span class="hint" data-t="goalHint"></span>
-    </div>
-  </section>
+
+
 
   <section class="panel migrate" id="migrateBox" hidden>
     <p id="migrateText"></p>
@@ -205,37 +159,11 @@
     <div class="datamsg" id="dataMsg"></div>
   </section>
 
-  <section class="panel" id="catsPanel" aria-labelledby="cgH">
-    <div class="panel-head"><h2 id="cgH" data-t="catsGoals"></h2>
-      <div class="mode" role="group">
-        <button type="button" data-mode="week" id="mode-week" data-t="perWeek"></button>
-        <button type="button" data-mode="day" id="mode-day" data-t="perDay"></button>
-      </div>
-    </div>
-    <p class="hint" id="goalHint" style="margin:0"></p>
-    <p class="hint cathelp" data-t="catHelp"></p>
-    <div class="catlist" id="catlist"></div>
-    <div class="streakset">
-      <label for="streakMin" data-t="streakRule"></label>
-      <input type="number" id="streakMin" min="0.25" step="0.25" class="mono">
-      <span class="hint" data-t="streakRule2"></span>
-    </div>
-    <div class="newcat">
-      <span class="label" data-t="newCat"></span>
-      <div class="row">
-        <input type="text" id="ncName" class="grow" data-tp="namePh" maxlength="24">
-        <label class="chk"><input type="checkbox" id="ncProd" checked><span data-t="prodLabel"></span></label>
-        <button class="primary" id="ncAdd" data-t="add"></button>
-      </div>
-      <div class="swatches" id="ncSw"></div>
-    </div>
-  </section>
+
 </div>
 
 <footer class="foot">
-  <div class="skinsw" role="group"><span data-t="lookLabel"></span>
-    <div class="mode"><button type="button" data-skin="luxe" id="skin-luxe" data-t="lookLuxe"></button><button type="button" data-skin="classic" id="skin-classic" data-t="lookClassic"></button></div>
-  </div>
+
   <div><span id="footVer"></span> · <a href="https://github.com/DZonLive/Daily_Tracker" target="_blank" rel="noopener">GitHub</a></div>
 </footer>
 
@@ -316,6 +244,132 @@
     <div class="swatches" id="colExtra"></div>
     <div class="label" data-t="colorsCustom"></div>
     <div class="row customcol"><input type="color" id="colCustom" aria-label="color"><button class="primary" id="colUse" data-t="useColor"></button></div>
+  </div>
+</dialog>
+
+<dialog class="drawer" id="drawer" aria-labelledby="drawerTitle">
+  <div class="drawerhead"><div><div class="dtitle" id="drawerTitle">Productivity Starter</div><div class="hint" id="drawerVer"></div></div><button type="button" class="iconbtn" data-close data-ta="close">×</button></div>
+  <nav class="menu">
+    <button type="button" class="mitem" data-open="pg-cats"><span class="mic">◎</span><span class="mtx"><b data-t="menuCats"></b><small data-t="menuCatsSub"></small></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="mitem" data-open="pg-income"><span class="mic">$</span><span class="mtx"><b data-t="income"></b><small data-t="menuIncomeSub"></small></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="mitem" data-open="pg-week"><span class="mic">▦</span><span class="mtx"><b data-t="weekDetail"></b><small data-t="menuWeekSub"></small></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="mitem" data-open="pg-settings"><span class="mic">⚙</span><span class="mtx"><b data-t="menuSettings"></b><small data-t="menuSettingsSub"></small></span><span class="chev" aria-hidden="true">›</span></button>
+  </nav>
+  <div class="menu2">
+  <button class="mitem2 installbtn" id="installBtn" type="button"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lbl-long" data-t="install"></span><span class="lbl-short" data-t="installShort"></span></button>
+  <button class="mitem2 sharebtn" id="shareBtn" type="button" data-ta="share"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 15V3m0 0L7.5 7.5M12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="share"></span></button>
+    <button type="button" class="mitem2" data-act="acct"><span class="mic2">●</span><span data-t="account"></span></button>
+  </div>
+  <div class="drawerfoot"><a href="https://github.com/DZonLive/Daily_Tracker" target="_blank" rel="noopener">GitHub</a></div>
+</dialog>
+<dialog class="page" id="pg-cats">
+  <div class="pagebar"><button type="button" class="iconbtn" data-close data-ta="back">←</button><h2 class="pagetitle" data-t="catsGoals"></h2></div>
+  <div class="pagebody">
+  <section class="panel" id="catsPanel" aria-labelledby="cgH">
+    <div class="panel-head"><h2 id="cgH" data-t="catsGoals"></h2>
+      <div class="mode" role="group">
+        <button type="button" data-mode="week" id="mode-week" data-t="perWeek"></button>
+        <button type="button" data-mode="day" id="mode-day" data-t="perDay"></button>
+      </div>
+    </div>
+    <p class="hint" id="goalHint" style="margin:0"></p>
+    <p class="hint cathelp" data-t="catHelp"></p>
+    <div class="catlist" id="catlist"></div>
+
+    <div class="newcat">
+      <span class="label" data-t="newCat"></span>
+      <div class="row">
+        <input type="text" id="ncName" class="grow" data-tp="namePh" maxlength="24">
+        <label class="chk"><input type="checkbox" id="ncProd" checked><span data-t="prodLabel"></span></label>
+        <button class="primary" id="ncAdd" data-t="add"></button>
+      </div>
+      <div class="swatches" id="ncSw"></div>
+    </div>
+  </section>
+  </div>
+</dialog>
+<dialog class="page" id="pg-income">
+  <div class="pagebar"><button type="button" class="iconbtn" data-close data-ta="back">←</button><h2 class="pagetitle" data-t="income"></h2></div>
+  <div class="pagebody">
+  <section class="panel" id="incomePanel" aria-labelledby="incH">
+    <div class="panel-head"><h2 id="incH" data-t="income"></h2>
+      <div class="wdtools">
+        <button class="iconbtn" id="iPrev" data-ta="prevMonth">‹</button>
+        <span class="hint mono" id="incMonth" style="min-width:130px;text-align:center"></span>
+        <button class="iconbtn" id="iNext" data-ta="nextMonth">›</button>
+      </div>
+    </div>
+    <div class="inc-top">
+      <div class="inc-big">
+        <div class="label" data-t="incMonthTotal"></div>
+        <div class="big mono" id="incMonthTotal">$0</div>
+        <div id="incGoalBox"></div>
+      </div>
+      <div class="inc-stats" id="incStats"></div>
+    </div>
+    <div class="mchart" id="mchart"></div>
+    <p class="hint inc-how" id="incHow"></p>
+    <div class="inc-legacy" id="incLegacy" hidden>
+      <h3><span data-t="legacyTitle"></span></h3>
+      <ul class="tasks inclist" id="incList"></ul>
+    </div>
+    <div class="streakset">
+      <label for="incGoal" data-t="incGoal"></label>
+      <label class="money small-money"><span>$</span><input type="number" id="incGoal" min="0" step="50" class="mono"></label>
+      <button type="button" class="goalclr" id="incGoalClr" data-ta="removeGoal" hidden>×</button>
+      <span class="hint" data-t="goalHint"></span>
+    </div>
+  </section>
+  </div>
+</dialog>
+<dialog class="page" id="pg-week">
+  <div class="pagebar"><button type="button" class="iconbtn" data-close data-ta="back">←</button><h2 class="pagetitle" data-t="weekDetail"></h2></div>
+  <div class="pagebody">
+  <section class="panel" aria-labelledby="wdH">
+    <div class="panel-head"><h2 id="wdH" data-t="weekDetail"></h2>
+      <div class="wdtools">
+        <button class="iconbtn" id="wPrev" data-ta="prevWeek">‹</button>
+        <span class="hint mono" id="wdRange" style="min-width:150px;text-align:center"></span>
+        <button class="iconbtn" id="wNext" data-ta="nextWeek">›</button>
+        <div class="mode" role="group">
+          <button type="button" data-wdr="auto" id="wdr-auto" data-t="rangeAuto"></button>
+          <button type="button" data-wdr="full" id="wdr-full">0–24</button>
+        </div>
+      </div>
+    </div>
+    <div class="wdscroll"><div class="wd" id="wd"></div></div>
+    <div class="wdnote" id="wdnote"></div>
+    <details class="wtable" id="wtable">
+      <summary data-t="showTable"></summary>
+      <div class="tblwrap"><table class="wt" id="wt"></table></div>
+    </details>
+  </section>
+  </div>
+</dialog>
+<dialog class="page" id="pg-settings">
+  <div class="pagebar"><button type="button" class="iconbtn" data-close data-ta="back">←</button><h2 class="pagetitle" data-t="menuSettings"></h2></div>
+  <div class="pagebody">
+  <section class="panel">
+    <div class="setrow"><span class="setlabel" data-t="setLang"></span>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en" id="lang-en">EN</button>
+        <button type="button" data-lang="ru" id="lang-ru">RU</button>
+      </div>
+    </div>
+    <div class="setrow"><span class="setlabel" data-t="lookLabel"></span>
+      <div class="mode"><button type="button" data-skin="luxe" id="skin-luxe" data-t="lookLuxe"></button><button type="button" data-skin="classic" id="skin-classic" data-t="lookClassic"></button></div>
+    </div>
+    <div class="setrow"><span class="setlabel" data-t="timeFmt"></span>
+      <div class="mode"><button type="button" data-clock="24" id="clk-24" data-t="use24"></button><button type="button" data-clock="12" id="clk-12" data-t="use12"></button></div>
+    </div>
+    <div class="setrow col"><span class="setlabel">Streak</span>
+    <div class="streakset">
+      <label for="streakMin" data-t="streakRule"></label>
+      <input type="number" id="streakMin" min="0.25" step="0.25" class="mono">
+      <span class="hint" data-t="streakRule2"></span>
+    </div>
+    </div>
+  </section>
   </div>
 </dialog>
 
