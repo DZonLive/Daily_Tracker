@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.16.0";
+const APP_VERSION="0.16.1";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -789,6 +789,14 @@ window.addEventListener("popstate",()=>{
   open.forEach(id=>$(id).close());
   popping=false;
 });
+
+// Floating ☰: appears once the header's menu button scrolls out of view, so the menu is always reachable.
+(function(){
+  const fab=$("fabMenu"),btn=$("menuBtn");if(!fab||!btn)return;
+  const show=v=>{fab.classList.toggle("show",v);fab.tabIndex=v?0:-1;fab.setAttribute("aria-hidden",v?"false":"true")};
+  if("IntersectionObserver" in window){new IntersectionObserver(es=>es.forEach(e=>show(!e.isIntersecting)),{threshold:0}).observe(btn)}
+  else{const f=()=>show(btn.getBoundingClientRect().bottom<0);addEventListener("scroll",f,{passive:true});f()}
+})();
 
 // ---------- edit an existing entry ----------
 // ✎ in the day log loads the entry into the "Log time" form; "Save changes" replaces it.

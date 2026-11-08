@@ -721,3 +721,12 @@ dialog.page[open]{display:flex;flex-direction:column;width:min(1040px,100vw);mar
 [data-skin="luxe"] .mitem .mic{background:color-mix(in srgb,var(--gold) 14%,var(--panel));color:var(--gold)}
 @media (prefers-reduced-motion:reduce){dialog.drawer[open],dialog.page[open]{animation:none}}
 .lang button[aria-pressed="false"],.mode button[aria-pressed="false"]{background:transparent;box-shadow:none}
+
+/* Floating menu button */
+.fabmenu{position:fixed;z-index:15;top:calc(env(safe-area-inset-top,0px) + 12px);left:max(12px,calc(env(safe-area-inset-left,0px) + 12px));
+  width:48px;height:48px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  box-shadow:0 8px 24px -8px rgba(0,0,0,.35);opacity:0;transform:translateY(-8px) scale(.9);pointer-events:none;
+  transition:opacity .22s ease,transform .22s cubic-bezier(.2,.8,.2,1),background-color .18s ease}
+.fabmenu.show{opacity:1;transform:none;pointer-events:auto}
+.fabmenu:active{transform:scale(.94)}
+[data-skin="luxe"] .fabmenu{border-color:color-mix(in srgb,var(--gold) 45%,var(--line))}

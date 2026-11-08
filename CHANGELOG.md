@@ -3,6 +3,9 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.16.1 (beta) — 2026-11-08
+- Floating ☰ button: stays in the top-left corner when you scroll down, so the menu is always one tap away
+
 ## 0.16.0 (beta) — 2026-11-08
 - Shorter main page: ☰ menu (top left) with Categories & goals, Income, Week in detail and Settings as separate pages
 - Week panel has a "Details" button that opens the hour grid and table
