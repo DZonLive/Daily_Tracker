@@ -365,11 +365,25 @@
       <div class="mode"><button type="button" data-clock="24" id="clk-24" data-t="use24"></button><button type="button" data-clock="12" id="clk-12" data-t="use12"></button></div>
     </div>
     <div class="setrow col"><span class="setlabel">Streak</span>
-    <div class="streakset">
-      <label for="streakMin" data-t="streakRule"></label>
-      <input type="number" id="streakMin" min="0.25" step="0.25" class="mono">
-      <span class="hint" data-t="streakRule2"></span>
-    </div>
+      <div class="mode" role="group">
+        <button type="button" data-smode="week" id="sm-week" data-t="smWeek"></button>
+        <button type="button" data-smode="day" id="sm-day" data-t="smDay"></button>
+        <button type="button" data-smode="off" id="sm-off" data-t="smOff"></button>
+      </div>
+      <p class="hint" id="smHint" style="margin:0"></p>
+      <div id="smWeekBox" class="streakopts">
+        <div class="mode" role="group">
+          <button type="button" data-srule="hours" id="sr-hours" data-t="srHours"></button>
+          <button type="button" data-srule="days" id="sr-days" data-t="srDays"></button>
+        </div>
+        <div class="streakset" id="srHoursBox"><label for="streakWeekH" data-t="srHoursL"></label><input type="number" id="streakWeekH" min="1" step="1" class="mono nospin" inputmode="decimal"><span class="hint" data-t="hoursU"></span></div>
+        <div class="streakset" id="srDaysBox"><label for="streakWeekDays" data-t="srDaysL"></label><input type="number" id="streakWeekDays" min="1" max="7" step="1" class="mono nospin" inputmode="numeric"><span class="hint" data-t="srDaysOf7"></span></div>
+      </div>
+      <div class="streakset" id="smDayBox">
+        <label for="streakMin" data-t="srDayMin"></label>
+        <input type="number" id="streakMin" min="0.25" step="0.25" class="mono nospin" inputmode="decimal">
+        <span class="hint" data-t="streakRule2"></span>
+      </div>
     </div>
   </section>
   </div>

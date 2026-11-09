@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.16.1";
+const APP_VERSION="0.17.0";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -59,6 +59,9 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  askPay:"How much did you earn for this?",askPayHint:"Leave empty or tap “No earnings” if this time wasn't paid.",savePay:"Save",noPay:"No earnings",backToTimer:"Back to timer",stopped:"Stopped",entryDeleted:"Entry deleted",
  menu:"Menu",back:"Back",detailsBtn:"Details",menuCats:"Categories & goals",menuCatsSub:"View and add categories, set goals",menuIncomeSub:"Month total, goal, earnings per hour",
  menuWeekSub:"Hour grid and table, edit entries",menuSettings:"Settings",menuSettingsSub:"Language, look, time format, streak",setLang:"Language",
+ smWeek:"Weekly",smDay:"Daily",smOff:"Off",srHours:"By hours",srDays:"By active days",srHoursL:"Productive time per week, at least",srDaysL:"Active days per week, at least",srDaysOf7:"of 7",srDayMin:"A day is active with productive time of at least",
+ smWeekHint:"Counts weeks in a row where you met your plan. Rest days don't break it, and the current week never resets it.",smDayHint:"Counts days in a row with productive time. Any day off breaks it.",smOffHint:"The streak is hidden.",
+ swWeek1:"week in a row",swWeeks:"weeks in a row",swThis:"this week {a} / {b}",swThisDone:"this week done ✓",srDaysGoal:"{n} days",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -127,6 +130,9 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  askPay:"Сколько заработал за это время?",askPayHint:"Оставь пустым или нажми «Без заработка», если за это время не платили.",savePay:"Сохранить",noPay:"Без заработка",backToTimer:"Вернуться к таймеру",stopped:"Остановлен",entryDeleted:"Запись удалена",
  menu:"Меню",back:"Назад",detailsBtn:"Подробно",menuCats:"Категории и цели",menuCatsSub:"Просмотр и добавление категорий, цели",menuIncomeSub:"Итог за месяц, цель, заработок в час",
  menuWeekSub:"Сетка по часам и таблица, правка записей",menuSettings:"Настройки",menuSettingsSub:"Язык, оформление, формат времени, streak",setLang:"Язык",
+ smWeek:"По неделям",smDay:"По дням",smOff:"Выключен",srHours:"По часам",srDays:"По активным дням",srHoursL:"Продуктивного времени в неделю, не меньше",srDaysL:"Активных дней в неделю, не меньше",srDaysOf7:"из 7",srDayMin:"День активный, если продуктивного времени не меньше",
+ smWeekHint:"Считает недели подряд, в которых ты выполнил план. Дни отдыха его не сбивают, а текущая неделя никогда не обнуляет серию.",smDayHint:"Считает дни подряд с продуктивным временем. Любой выходной обнуляет серию.",smOffHint:"Streak скрыт.",
+ swWeek1:"неделя подряд",swWeeks:"недель подряд",swThis:"эта неделя {a} / {b}",swThisDone:"эта неделя выполнена ✓",srDaysGoal:"{n} дн.",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -163,7 +169,7 @@ const S={
   days:{},          // date -> {entries:[], tasks:[], note:""}
   cats:DEFAULT_CATS.map(c=>({...c})),
   goals:{...DEF_DAY}, wgoals:{...DEF_WEEK}, goalMode:"week",
-  timer:null, sel:todayStr(), month:null, cat:"study", dh:0, dm:0, tmode:"range", clock12:false, newColor:"sky", streakMin:60, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
+  timer:null, sel:todayStr(), month:null, cat:"study", dh:0, dm:0, tmode:"range", clock12:false, newColor:"sky", streakMin:60, streakMode:"week", streakRule:"hours", streakWeekH:900, streakWeekDays:5, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
 };
 S.month=monthOf(S.sel);
 try{const tm=localStorage.getItem("ps-tmode2");if(tm==="dur"||tm==="range")S.tmode=tm}catch(e){}
@@ -250,7 +256,7 @@ let user=null;           // {uid,email,name} when signed in
 let unsub=null;          // stops cloud listeners
 let lastSettingsJSON=""; // avoid re-writing settings that came from the server
 function queued(key,fn){const p=(queues[key]||Promise.resolve()).then(fn,fn);queues[key]=p.catch(()=>{});return p}
-function settingsBody(){return {type:"settings",cats:S.cats,goals:S.goals,wgoals:S.wgoals,goalMode:S.goalMode,timer:S.timer,lang:LANG,streakMin:S.streakMin,incomeGoal:S.incomeGoal,payMode:S.payMode,payRates:S.payRates,clock12:S.clock12}}
+function settingsBody(){return {type:"settings",cats:S.cats,goals:S.goals,wgoals:S.wgoals,goalMode:S.goalMode,timer:S.timer,lang:LANG,streakMin:S.streakMin,streakMode:S.streakMode,streakRule:S.streakRule,streakWeekH:S.streakWeekH,streakWeekDays:S.streakWeekDays,incomeGoal:S.incomeGoal,payMode:S.payMode,payRates:S.payRates,clock12:S.clock12}}
 function applySettings(v){
   if(!v)return;
   if(Array.isArray(v.cats)&&v.cats.length)S.cats=v.cats.map(c=>({...c}));
@@ -259,6 +265,10 @@ function applySettings(v){
   if(v.goalMode==="day"||v.goalMode==="week")S.goalMode=v.goalMode;
   S.timer=v.timer||null;
   if(+v.streakMin>0)S.streakMin=+v.streakMin;
+  if(["week","day","off"].includes(v.streakMode))S.streakMode=v.streakMode;
+  if(["hours","days"].includes(v.streakRule))S.streakRule=v.streakRule;
+  if(+v.streakWeekH>0)S.streakWeekH=+v.streakWeekH;
+  if(+v.streakWeekDays>=1&&+v.streakWeekDays<=7)S.streakWeekDays=Math.round(+v.streakWeekDays);
   if(v.incomeGoal!=null&&isFinite(+v.incomeGoal))S.incomeGoal=Math.max(0,+v.incomeGoal);
   if(v.payMode==="sum"||v.payMode==="rate")S.payMode=v.payMode;
   if(v.payRates&&typeof v.payRates==="object")S.payRates={...v.payRates};
@@ -700,7 +710,49 @@ function streakInfo(){
   dates.forEach(k=>{if(prodMin(k)>=thr){run=(prev&&addDays(prev,1)===k)?run+1:1;prev=k;if(run>best)best=run}else{prev=null;run=0}});
   return {cur,best:Math.max(best,cur),todayDone:prodMin(today)>=thr,todayMin:prodMin(today)};
 }
+// Weekly streak: weeks in a row (Mon–Sun) where the plan was met — enough productive hours,
+// or enough active days (a day is active with at least the daily threshold of productive time).
+// The current week never breaks the streak while it is still going; it only adds to it once met.
+function weekProgress(ws){
+  let mins=0,days=0;
+  for(let i=0;i<7;i++){const m=prodMin(addDays(ws,i));mins+=m;if(m>=S.streakMin)days++}
+  const byHours=S.streakRule==="hours";
+  const val=byHours?mins:days,goal=byHours?S.streakWeekH:S.streakWeekDays;
+  return {mins,days,val,goal,met:val>=goal};
+}
+function weekStreakInfo(){
+  const cur0=weekStart(todayStr());
+  const thisWeek=weekProgress(cur0);
+  let n=0,w=addDays(cur0,-7);
+  const first=Object.keys(S.days).filter(k=>day(k).entries.length).sort()[0];
+  const firstW=first?weekStart(first):cur0;
+  while(w>=firstW&&weekProgress(w).met){n++;w=addDays(w,-7)}
+  const cur=n+(thisWeek.met?1:0);
+  // best run
+  let best=0,run=0;
+  for(let x=firstW;x<=cur0;x=addDays(x,7)){if(weekProgress(x).met){run++;if(run>best)best=run}else if(x!==cur0)run=0}
+  return {cur,best:Math.max(best,cur),thisWeek,cur0};
+}
+function plWeeks(n){if(LANG==="en")return n===1?T("swWeek1"):T("swWeeks");const a=n%10,b=n%100;return (a===1&&b!==11)?"неделя подряд":(a>=2&&a<=4&&(b<10||b>=20))?"недели подряд":"недель подряд"}
 function renderStreak(){
+  const box=$("streak");
+  if(S.streakMode==="off"){box.hidden=true;return}
+  box.hidden=false;
+  if(S.streakMode==="day")return renderDayStreak();
+  const s=weekStreakInfo(),tw=s.thisWeek,byHours=S.streakRule==="hours";
+  const fmtVal=v=>byHours?fmt(v):String(v);
+  const goalTxt=byHours?fmt(tw.goal):T("srDaysGoal",{n:tw.goal});
+  let dots="";
+  for(let i=7;i>=0;i--){const ws=addDays(s.cur0,-7*i),p=weekProgress(ws),now=i===0;
+    const pct=Math.min(1,p.val/p.goal);
+    dots+=`<i class="${p.met?"ok":""}${now?" td":""}" style="--p:${pct}" title="${fD().format(parse(ws))} – ${fD().format(parse(addDays(ws,6)))}: ${fmtVal(p.val)} / ${goalTxt}"></i>`}
+  const pct=Math.min(100,Math.round(tw.val/tw.goal*100));
+  box.innerHTML=`<div class="sw-main"><div class="num${s.cur>=3?" hot":""}"><b>${s.cur}</b><span>${plWeeks(s.cur)}</span></div>
+    <div class="best">${T("streakBest",{n:"<b>"+s.best+"</b>"})} · ${tw.met?T("swThisDone"):T("swThis",{a:fmtVal(tw.val),b:goalTxt})}</div>
+    <div class="swbar"><i style="width:${pct}%"></i></div></div>
+    <div class="sdots weeks" aria-hidden="true">${dots}</div>`;
+}
+function renderDayStreak(){
   const s=streakInfo(),thr=S.streakMin,today=todayStr();
   let dots="";for(let i=13;i>=0;i--){const d=addDays(today,-i);const ok=prodMin(d)>=thr;dots+=`<i class="${ok?"ok":""}${i===0?" td":""}" title="${fD().format(parse(d))}: ${fmt(prodMin(d))}"></i>`}
   const word=LANG==="en"?(s.cur===1?T("streakNow1"):T("streakNow")):(()=>{const a=s.cur%10,b=s.cur%100;return (a===1&&b!==11)?T("streakNow1"):(a>=2&&a<=4&&(b<10||b>=20))?"дня подряд":T("streakNow")})();
@@ -1043,6 +1095,14 @@ function renderWeekDetail(){
 let catDelAsk=null; // key of the category waiting for "Delete?" confirmation
 function renderCatManager(){
   const smi=$("streakMin");if(document.activeElement!==smi)smi.value=+(S.streakMin/60).toFixed(2);
+  ["week","day","off"].forEach(m=>$("sm-"+m).setAttribute("aria-pressed",S.streakMode===m));
+  ["hours","days"].forEach(r=>$("sr-"+r).setAttribute("aria-pressed",S.streakRule===r));
+  $("smWeekBox").hidden=S.streakMode!=="week";
+  $("srHoursBox").hidden=S.streakRule!=="hours";$("srDaysBox").hidden=S.streakRule!=="days";
+  $("smDayBox").hidden=S.streakMode==="off"||(S.streakMode==="week"&&S.streakRule==="hours");
+  $("smHint").textContent=T(S.streakMode==="week"?"smWeekHint":S.streakMode==="day"?"smDayHint":"smOffHint");
+  const wh=$("streakWeekH");if(document.activeElement!==wh)wh.value=+(S.streakWeekH/60).toFixed(1);
+  const wd=$("streakWeekDays");if(document.activeElement!==wd)wd.value=S.streakWeekDays;
   const weekly=S.goalMode==="week";
   $("mode-week").setAttribute("aria-pressed",weekly);$("mode-day").setAttribute("aria-pressed",!weekly);
   $("goalHint").textContent=T(weekly?"hintWeek":"hintDay");
@@ -1082,6 +1142,8 @@ document.addEventListener("click",async ev=>{
   if(ds.day){selectDay(ds.day);return}
   if(ds.skin){const v=ds.skin==="classic"?"classic":"luxe";document.documentElement.dataset.skin=v;try{localStorage.setItem("ps-skin",v)}catch(e){}applyStatic();return}
   if(ds.tpm){S.payMode=ds.tpm;timerPayDraft="";const tp=$("tPay");if(tp)tp.value="";renderTimer();renderPay();saveSettings();return}
+  if(ds.smode){S.streakMode=ds.smode;render();saveSettings();return}
+  if(ds.srule){S.streakRule=ds.srule;render();saveSettings();return}
   if(ds.pm){if(S.payMode!==ds.pm){S.payMode=ds.pm;$("payIn").value="";renderPay();renderTimer();saveSettings()}return}
   if(ds.wdr){S.wdRange=ds.wdr;renderWeekDetail();return}
   if(ds.mode){S.goalMode=ds.mode;render();saveSettings();return}
@@ -1243,6 +1305,8 @@ document.addEventListener("keydown",e=>{
 });
 window.addEventListener("pagehide",flushNote);
 let smT;
+$("streakWeekH").addEventListener("input",e=>{const n=Math.round((+e.target.value||0)*60);if(!(n>0))return;S.streakWeekH=n;renderStreak();clearTimeout(smT);smT=setTimeout(saveSettings,700)});
+$("streakWeekDays").addEventListener("input",e=>{const n=Math.round(+e.target.value||0);if(!(n>=1&&n<=7))return;S.streakWeekDays=n;renderStreak();clearTimeout(smT);smT=setTimeout(saveSettings,700)});
 $("streakMin").addEventListener("input",e=>{const n=Math.round((+e.target.value||0)*60);if(!(n>0))return;S.streakMin=n;renderStreak();clearTimeout(smT);smT=setTimeout(saveSettings,700)});
 
 boot();

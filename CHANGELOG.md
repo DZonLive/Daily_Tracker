@@ -3,6 +3,11 @@
 Version numbers follow `MAJOR.MINOR.PATCH`. Versions below 1.0 are **beta**.
 When releasing: update `APP_VERSION` in `app.js`, `VERSION` in `sw.js`, and add a section here.
 
+## 0.17.0 (beta) — 2026-11-09
+- Streak is now weekly by default: weeks in a row where you met your plan (productive hours per week, or active days per week). Rest days no longer break it, and the current week never resets it
+- Settings → Streak: Weekly / Daily (old behaviour) / Off, and the weekly rule and goal
+- Streak panel shows this week's progress and the last 8 weeks
+
 ## 0.16.1 (beta) — 2026-11-08
 - Floating ☰ button: stays in the top-left corner when you scroll down, so the menu is always one tap away
 
