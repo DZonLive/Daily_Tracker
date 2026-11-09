@@ -743,3 +743,22 @@ dialog.page[open]{display:flex;flex-direction:column;width:min(1040px,100vw);mar
 .streakopts{display:grid;gap:10px}
 .streakopts[hidden],#smDayBox[hidden]{display:none!important}
 .streakset[hidden]{display:none!important}
+
+/* Week navigation */
+.weeknav{display:inline-flex;align-items:center;gap:4px}
+.wkarrow{width:34px;height:34px;font-size:18px}
+.wkarrow:disabled{opacity:.35;cursor:default}
+.wkrange{min-width:118px;text-align:center}
+.thiswk{height:34px}
+.swnav{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0}
+.swnav .swlabel{font-size:13px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.swnav .wkarrow{width:28px;height:28px;font-size:15px;flex:none}
+.sdots.weeks .wbar{width:14px;height:22px;padding:0;border:0;border-radius:4px;cursor:pointer;
+  background:linear-gradient(to top,color-mix(in srgb,var(--gold,var(--work)) 55%,transparent) calc(var(--p)*100%),var(--line) 0)}
+.sdots.weeks .wbar.ok{background:var(--gold,var(--work))}
+.sdots.weeks .wbar.td{outline:2px solid var(--ink);outline-offset:1px}
+.sdots.weeks .wbar:hover{filter:brightness(1.08)}
+@keyframes slideL{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+@keyframes slideR{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.swapL{animation:slideL .25s ease both}.swapR{animation:slideR .25s ease both}
+#chart,#wd{touch-action:pan-y}

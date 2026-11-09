@@ -1,6 +1,6 @@
 "use strict";
 // Productivity Starter — keep in sync with VERSION in sw.js and CHANGELOG.md
-const APP_VERSION="0.17.0";
+const APP_VERSION="0.17.1";
 (function(){
 // ---------- i18n ----------
 const I18N={
@@ -62,6 +62,7 @@ en:{sub:"Time journal: where your hours actually go",today:"Today",prevDay:"Prev
  smWeek:"Weekly",smDay:"Daily",smOff:"Off",srHours:"By hours",srDays:"By active days",srHoursL:"Productive time per week, at least",srDaysL:"Active days per week, at least",srDaysOf7:"of 7",srDayMin:"A day is active with productive time of at least",
  smWeekHint:"Counts weeks in a row where you met your plan. Rest days don't break it, and the current week never resets it.",smDayHint:"Counts days in a row with productive time. Any day off breaks it.",smOffHint:"The streak is hidden.",
  swWeek1:"week in a row",swWeeks:"weeks in a row",swThis:"this week {a} / {b}",swThisDone:"this week done ✓",srDaysGoal:"{n} days",
+ thisWeek:"This week",
  install:"Get the app",installShort:"Get app",instTitle:"Install the app",instLead:"Installed, it opens from your home screen or desktop like a normal app, full screen and offline.",instOther:"Other devices",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Tap the <b>Share</b> button (square with an arrow) at the bottom of Safari.","Scroll down and tap <b>Add to Home Screen</b>.","Tap <b>Add</b>. The app icon appears on your home screen."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Open this page in <b>Safari</b> (copy the link and paste it there).","Tap <b>Share</b>, then <b>Add to Home Screen</b>, then <b>Add</b>."],inst_iosOther_note:"Some other iPhone browsers also have Add to Home Screen in their Share menu, but Safari is the most reliable.",
@@ -133,6 +134,7 @@ ru:{sub:"Дневник времени: на что на самом деле у�
  smWeek:"По неделям",smDay:"По дням",smOff:"Выключен",srHours:"По часам",srDays:"По активным дням",srHoursL:"Продуктивного времени в неделю, не меньше",srDaysL:"Активных дней в неделю, не меньше",srDaysOf7:"из 7",srDayMin:"День активный, если продуктивного времени не меньше",
  smWeekHint:"Считает недели подряд, в которых ты выполнил план. Дни отдыха его не сбивают, а текущая неделя никогда не обнуляет серию.",smDayHint:"Считает дни подряд с продуктивным временем. Любой выходной обнуляет серию.",smOffHint:"Streak скрыт.",
  swWeek1:"неделя подряд",swWeeks:"недель подряд",swThis:"эта неделя {a} / {b}",swThisDone:"эта неделя выполнена ✓",srDaysGoal:"{n} дн.",
+ thisWeek:"Эта неделя",
  install:"Скачать приложение",installShort:"Скачать",instTitle:"Установить приложение",instLead:"После установки оно открывается с главного экрана или рабочего стола как обычное приложение: на весь экран и без интернета.",instOther:"Другие устройства",
  inst_ios:"iPhone / iPad (Safari)",inst_ios_steps:["Нажми кнопку <b>«Поделиться»</b> (квадрат со стрелкой) внизу Safari.","Пролистай вниз и выбери <b>«На экран „Домой“»</b>.","Нажми <b>«Добавить»</b>. Иконка появится на главном экране."],
  inst_iosOther:"iPhone / iPad",inst_iosOther_steps:["Открой эту страницу в <b>Safari</b> (скопируй ссылку и вставь её туда).","Нажми <b>«Поделиться»</b> → <b>«На экран „Домой“»</b> → <b>«Добавить»</b>."],inst_iosOther_note:"В некоторых других браузерах на iPhone тоже есть «На экран „Домой“» в меню «Поделиться», но надёжнее всего Safari.",
@@ -172,6 +174,7 @@ const S={
   timer:null, sel:todayStr(), month:null, cat:"study", dh:0, dm:0, tmode:"range", clock12:false, newColor:"sky", streakMin:60, streakMode:"week", streakRule:"hours", streakWeekH:900, streakWeekDays:5, wdRange:"auto", incomeGoal:0, payMode:"sum", payRates:{},
 };
 S.month=monthOf(S.sel);
+S.wk=weekStart(S.sel); // week shown in the Week panel, streak and week detail (arrows move only this)
 try{const tm=localStorage.getItem("ps-tmode2");if(tm==="dur"||tm==="range")S.tmode=tm}catch(e){}
 
 // Category colors: a theme token ("study", "sky"…) or any custom "#rrggbb" picked from the palette.
@@ -499,7 +502,7 @@ async function addEntry(cat,min,note,date,start,pay,extra){
 async function delEntry(date,id){setDay(date,{entries:day(date).entries.filter(e=>e.id!==id)});render();await saveDay(date)}
 function showMsg(t,err){const m=$("msg");m.textContent=t;m.className="msg"+(err?" err":"");clearTimeout(showMsg.t);showMsg.t=setTimeout(()=>{m.textContent=""},3500)}
 function selectDay(d){
-  flushNote();const changed=d!==S.sel;S.sel=d;if(monthOf(d)!==S.month)S.month=monthOf(d);render();
+  flushNote();const changed=d!==S.sel;S.sel=d;if(monthOf(d)!==S.month)S.month=monthOf(d);S.wk=weekStart(d);render();
   // soft fade of the day's content when switching days
   if(changed)["cats","log","tasks","incStats","dayLabel"].forEach(id=>{const el=$(id);if(!el)return;el.classList.remove("swap");void el.offsetWidth;el.classList.add("swap")});
 }
@@ -679,8 +682,13 @@ function activeMs(tm,now=Date.now()){return Math.max(0,now-tm.start-pausedMs(tm,
 function tick(){const c=$("clock");if(!c||!S.timer)return;const s=Math.floor(activeMs(S.timer)/1000);c.textContent=Math.floor(s/3600)+":"+pad(Math.floor(s/60)%60)+":"+pad(s%60)}
 setInterval(tick,1000);
 
+function setWeek(ws){
+  if(ws===S.wk)return;const dir=ws>S.wk?1:-1;S.wk=ws;
+  renderWeek();renderStreak();renderWeekDetail();
+  ["chart","wkTot","wd"].forEach(id=>{const el=$(id);if(!el)return;el.classList.remove("swapL","swapR");void el.offsetWidth;el.classList.add(dir>0?"swapR":"swapL")});
+}
 function renderWeek(){
-  const ws=weekStart(S.sel);const days=[...Array(7)].map((_,i)=>addDays(ws,i));
+  const ws=S.wk;$("thisWeek").hidden=ws===weekStart(todayStr());const days=[...Array(7)].map((_,i)=>addDays(ws,i));
   const tots=days.map(dayTotals),sums=tots.map(sumT);
   const maxMin=Math.max(240,...sums);const stepH=maxMin<=360?1:maxMin<=720?2:4;
   const top=Math.ceil(maxMin/60/stepH)*stepH*60;const dow=I18N[LANG].dow;
@@ -690,9 +698,9 @@ function renderWeek(){
     const segs=catsWithTime(t).map(c=>`<span style="height:${t[c.k]/top*200}px;background:var(${c.v})"></span>`).join("");
     return `<button class="col${d===S.sel?" sel":""}" data-day="${d}" aria-label="${dow[i]} ${fmt(s)}">${s?`<span class="tot">${fmtShort(s)}</span>`:""}<div class="stack">${segs}</div><span class="lab">${dow[i]} ${parse(d).getDate()}</span></button>`}).join("");
   $("chart").innerHTML=`<div class="grid">${grid}</div><div class="cols">${cols}</div>`;
-  const wk=weekTotals(S.sel);const all=sums.reduce((a,b)=>a+b,0),active=sums.filter(Boolean).length;
+  const wk=weekTotals(S.wk);const all=sums.reduce((a,b)=>a+b,0),active=sums.filter(Boolean).length;
   const list=[...activeCats()];catsWithTime(wk).forEach(c=>{if(!list.find(x=>x.k===c.k))list.push(c)});
-  $("wkTot").innerHTML=list.map(c=>{const g=+S.wgoals[c.k]||0;return `<div class="line" style="--c:var(${c.v})"><span class="dot"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</span><span class="mono">${fmt(wk[c.k]||0)}${S.goalMode==="week"&&g?` <span style="color:var(--muted)">/ ${fmtShort(g)}</span>`:""}</span></div>`}).join("")
+  $("wkTot").innerHTML=list.map(c=>{const g=+S.wgoals[c.k]||0;return `<div class="line" style="--c:var(${c.v})"><span class="dot"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</span><span class="mono">${fmt(wk[c.k]||0)}${S.goalMode==="week"&&g?` <span style="color:var(--muted)">/ ${fmt(g)}</span>`:""}</span></div>`}).join("")
     +`<hr><div class="line"><b>${T("total")}</b><span class="mono"><b>${fmt(all)}</b></span></div>
       <div class="line">${T("productive")}<span class="mono">${fmt(prodShare(wk))}</span></div>
       <div class="line">${T("activeDays")}<span class="mono">${T("ofSeven",{n:active})}</span></div>
@@ -739,16 +747,21 @@ function renderStreak(){
   if(S.streakMode==="off"){box.hidden=true;return}
   box.hidden=false;
   if(S.streakMode==="day")return renderDayStreak();
-  const s=weekStreakInfo(),tw=s.thisWeek,byHours=S.streakRule==="hours";
+  const s=weekStreakInfo(),byHours=S.streakRule==="hours";
+  const curW=s.cur0,viewW=S.wk>curW?curW:S.wk,isNow=viewW===curW,tw=weekProgress(viewW);
   const fmtVal=v=>byHours?fmt(v):String(v);
   const goalTxt=byHours?fmt(tw.goal):T("srDaysGoal",{n:tw.goal});
   let dots="";
-  for(let i=7;i>=0;i--){const ws=addDays(s.cur0,-7*i),p=weekProgress(ws),now=i===0;
+  // 8 bars ending at the current week, or at the viewed week if it is older
+  const endW=viewW<addDays(curW,-49)?addDays(viewW,21):curW;
+  for(let i=7;i>=0;i--){const ws=addDays(endW,-7*i);if(ws>curW)continue;const p=weekProgress(ws);
     const pct=Math.min(1,p.val/p.goal);
-    dots+=`<i class="${p.met?"ok":""}${now?" td":""}" style="--p:${pct}" title="${fD().format(parse(ws))} – ${fD().format(parse(addDays(ws,6)))}: ${fmtVal(p.val)} / ${goalTxt}"></i>`}
+    dots+=`<button type="button" class="wbar${p.met?" ok":""}${ws===viewW?" td":""}" data-swk="${ws}" style="--p:${pct}" aria-label="${fD().format(parse(ws))} – ${fD().format(parse(addDays(ws,6)))}: ${fmtVal(p.val)} / ${goalTxt}" title="${fD().format(parse(ws))} – ${fD().format(parse(addDays(ws,6)))}: ${fmtVal(p.val)} / ${goalTxt}"></button>`}
+  const wlabel=isNow?(tw.met?T("swThisDone"):T("swThis",{a:fmtVal(tw.val),b:goalTxt})):`${fD().format(parse(viewW))} – ${fD().format(parse(addDays(viewW,6)))}: ${fmtVal(tw.val)} / ${goalTxt}${tw.met?" ✓":""}`;
   const pct=Math.min(100,Math.round(tw.val/tw.goal*100));
   box.innerHTML=`<div class="sw-main"><div class="num${s.cur>=3?" hot":""}"><b>${s.cur}</b><span>${plWeeks(s.cur)}</span></div>
-    <div class="best">${T("streakBest",{n:"<b>"+s.best+"</b>"})} · ${tw.met?T("swThisDone"):T("swThis",{a:fmtVal(tw.val),b:goalTxt})}</div>
+    <div class="best">${T("streakBest",{n:"<b>"+s.best+"</b>"})}</div>
+    <div class="swnav"><button type="button" class="iconbtn wkarrow" data-wk="-1" aria-label="${T("prevWeek")}">‹</button><span class="swlabel">${wlabel}</span><button type="button" class="iconbtn wkarrow" data-wk="1" aria-label="${T("nextWeek")}" ${isNow?"disabled":""}>›</button></div>
     <div class="swbar"><i style="width:${pct}%"></i></div></div>
     <div class="sdots weeks" aria-hidden="true">${dots}</div>`;
 }
@@ -849,6 +862,15 @@ window.addEventListener("popstate",()=>{
   if("IntersectionObserver" in window){new IntersectionObserver(es=>es.forEach(e=>show(!e.isIntersecting)),{threshold:0}).observe(btn)}
   else{const f=()=>show(btn.getBoundingClientRect().bottom<0);addEventListener("scroll",f,{passive:true});f()}
 })();
+
+// Swipe left/right on the week chart or the week grid to change the week (phones)
+function swipeWeeks(el){
+  if(!el)return;let x0=null,y0=null;
+  el.addEventListener("touchstart",e=>{const t=e.touches[0];x0=t.clientX;y0=t.clientY},{passive:true});
+  el.addEventListener("touchend",e=>{if(x0==null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
+    if(Math.abs(dx)>60&&Math.abs(dy)<45)setWeek(addDays(S.wk,dx<0?7:-7))},{passive:true});
+}
+swipeWeeks($("chart"));swipeWeeks($("wd"));
 
 // ---------- edit an existing entry ----------
 // ✎ in the day log loads the entry into the "Log time" form; "Save changes" replaces it.
@@ -1046,7 +1068,7 @@ function renderIncome(){
 }
 // ---------- week detail ----------
 function renderWeekDetail(){
-  const ws=weekStart(S.sel),days=[...Array(7)].map((_,i)=>addDays(ws,i)),today=todayStr(),dow=I18N[LANG].dow;
+  const ws=S.wk,days=[...Array(7)].map((_,i)=>addDays(ws,i)),today=todayStr(),dow=I18N[LANG].dow;
   $("wdRange").textContent=fD().format(parse(days[0]))+" – "+fD().format(parse(days[6]));
   $("wdr-auto").setAttribute("aria-pressed",S.wdRange==="auto");$("wdr-full").setAttribute("aria-pressed",S.wdRange==="full");
   const all=[];days.forEach((d,i)=>day(d).entries.forEach(e=>all.push({...e,date:d,di:i,s:toMin(e.start)})));
@@ -1142,6 +1164,8 @@ document.addEventListener("click",async ev=>{
   if(ds.day){selectDay(ds.day);return}
   if(ds.skin){const v=ds.skin==="classic"?"classic":"luxe";document.documentElement.dataset.skin=v;try{localStorage.setItem("ps-skin",v)}catch(e){}applyStatic();return}
   if(ds.tpm){S.payMode=ds.tpm;timerPayDraft="";const tp=$("tPay");if(tp)tp.value="";renderTimer();renderPay();saveSettings();return}
+  if(ds.wk){setWeek(addDays(S.wk,7*+ds.wk));return}
+  if(ds.swk){setWeek(ds.swk);return}
   if(ds.smode){S.streakMode=ds.smode;render();saveSettings();return}
   if(ds.srule){S.streakRule=ds.srule;render();saveSettings();return}
   if(ds.pm){if(S.payMode!==ds.pm){S.payMode=ds.pm;$("payIn").value="";renderPay();renderTimer();saveSettings()}return}
@@ -1173,8 +1197,9 @@ document.addEventListener("click",async ev=>{
     case "prev":selectDay(addDays(S.sel,-1));break;
     case "next":selectDay(addDays(S.sel,1));break;
     case "today":selectDay(todayStr());break;
-    case "wPrev":selectDay(addDays(S.sel,-7));break;
-    case "wNext":selectDay(addDays(S.sel,7));break;
+    case "wPrev":setWeek(addDays(S.wk,-7));break;
+    case "wNext":setWeek(addDays(S.wk,7));break;
+    case "thisWeek":setWeek(weekStart(todayStr()));break;
     case "mPrev":S.month=addMonths(S.month,-1);renderCalendar();renderIncome();break;
     case "mNext":S.month=addMonths(S.month,1);renderCalendar();renderIncome();break;
     case "goNewCat":openPage("pg-cats");setTimeout(()=>$("ncName").focus(),320);break;
